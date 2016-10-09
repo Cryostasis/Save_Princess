@@ -116,7 +116,7 @@ void render_all()
 void init_scene()
 {
 	GLuint tex = get_texture_from_tga("textures/sych.tga");
-	sych = new FlatMesh(WND_RESOLUTION[0], WND_RESOLUTION[0], 0, 0, tex, WND_ASPECT, 720);
+	sych = new FlatMesh(WND_RESOLUTION[0], WND_RESOLUTION[0], 0, 0, tex, WND_ASPECT, 72);
 
 	texts.resize(1);
 	texts[0] = new TextMesh(

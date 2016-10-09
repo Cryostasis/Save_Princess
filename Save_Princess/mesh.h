@@ -75,8 +75,8 @@ class FlatMesh : public Mesh
 {
 public:
 	FlatMesh(int wnd_w, int wnd_h, int x, int y, GLuint texture, float aspect, float scale) :
-		Mesh(vec3((GLfloat)(x * 2 - scale * aspect / 2) / wnd_w,
-			(GLfloat)(-y * 2) / wnd_h, 0),
+		Mesh(vec3((GLfloat)(x * 2 * aspect - scale * aspect / 2) / wnd_w,
+			(GLfloat)(-y * 2 * aspect) / wnd_h, 0),
 			vec3(scale, scale, scale * aspect) / wnd_w, texture,
 			clone_obj_ptr("objects/quad.obj")) { Mesh::rotate(M_PI_2, 0, 0); };
 	void render(GLuint program, Camera &camera);
