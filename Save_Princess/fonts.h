@@ -14,7 +14,7 @@ class TextMesh
 {
 public:
 	TextMesh(int wnd_w, int wnd_h, int X, int Y, char *text, vec4 color, float aspect, float scale);
-	void render();
+	void render(GLuint program, Camera &camera);
 private:
 
 	std::vector<Mesh> _mesh;

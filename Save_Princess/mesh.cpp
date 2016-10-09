@@ -22,7 +22,6 @@ Mesh::Mesh(vec3 pos, vec3 scale, GLuint tex, ObjInfo *mod)
 	size = fmax(fmax(scale.v[0], scale.v[1]), scale.v[2]);
 	texture = tex;
 	visible = true;
-	physics = false;
 	model = mod;
 	aux_matrix = mat4_identity;
 
@@ -93,14 +92,47 @@ mat4 Mesh::get_model_mat()
 void Mesh::render(GLuint program, Camera &camera, bool regular)
 {
 	camera.setup(program, get_model_mat());
+	//material_setup(program, material);
 
-	if (regular)
-	{
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
-	}
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	//glUniform1i(material_locs.texture_loc, 0);
+	
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, ind_cnt, GL_UNSIGNED_INT, NULL);
+}
+
+void Mesh::render_normals(GLuint program, Camera &camera, bool regular)
+{
+	camera.setup(program, get_model_mat());
+	//material_setup(program, mat);
+
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, norm_tex);
+	//glUniform1i(material_locs.texture_loc, 0);
+
+	vec3 buf = vec3(1.0, 0.0, 0.0);
+
+	glUniform3fv(LINE_COLOR_LOC, 1, buf.v);
+
+	glBindVertexArray(N_VAO);
+	glDrawElements(GL_LINES, ind_cnt * 2, GL_UNSIGNED_INT, NULL);
+}
+
+void Mesh::render_pol_mesh(GLuint program, Camera &camera, bool regular)
+{
+	camera.setup(program, get_model_mat());
+
+	glUniform3fv(LINE_COLOR_LOC, 1, &vec3(0.0, 1.0, 0.0).v[0]);
+
+	glBindVertexArray(P_VAO);
+	glDrawElements(GL_LINES, ind_cnt * 2, GL_UNSIGNED_INT, NULL);
+}
+
+void Mesh::render_with_norms(GLuint program, Camera &camera, bool regular)
+{
+	render(program, camera, regular);
+	render_normals(program, camera, regular);
 }
 
 void Mesh::rotate(GLfloat x, GLfloat y, GLfloat z)
@@ -149,4 +181,27 @@ void Mesh::set_size(float sz)
 {
 	size = sz;
 	scale = GLScale(sz, sz, sz);
+}
+
+void Mesh::look_at(vec3 pos, vec3 target, vec3 up)
+{
+	position = pos;
+	rotate_strict(GLToEulerRad(transpose(GLLookAt(pos, target, up))));
+}
+
+void Mesh::look_at_dir(vec3 pos, vec3 dir, vec3 up)
+{
+	position = pos;
+	rotation = GLLookAt(pos, pos + dir, up);
+}
+
+void FlatMesh::render(GLuint program, Camera & camera)
+{
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+
+	glUniform1i(FONT_TEX, 0);
+	Mesh::render(program, camera, false);
+
+	glEnable(GL_DEPTH_TEST);
 }

@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "fonts.h"
 #include "glerrors.h"
+#include "textures.h"
 
 #include <exception>
 #include <vector>
@@ -12,14 +13,15 @@
 using namespace std;
 
 vector<TextMesh*> texts(0);
-
+FlatMesh* sych;
 
 
 void render()
 {
 	glUseProgram(textProgram);
 
-	texts[0]->render();
+	texts[0]->render(textProgram, textCamera);
+	sych->render(textProgram, textCamera);
 
 	glutSwapBuffers();
 	check_GL_error();
@@ -113,9 +115,12 @@ void render_all()
 
 void init_scene()
 {
+	GLuint tex = get_texture_from_tga("textures/sych.tga");
+	sych = new FlatMesh(WND_RESOLUTION[0], WND_RESOLUTION[0], 0, 0, tex, WND_ASPECT, 720);
+
 	texts.resize(1);
 	texts[0] = new TextMesh(
-		WND_RESOLUTION[0], WND_RESOLUTION[1], 200, -200, "text", vec4(1.0, 1.0, 1.0, 1.0), WND_ASPECT, 12);
+		WND_RESOLUTION[0], WND_RESOLUTION[1], 1000, 200, "text", vec4(1.0, 1.0, 1.0, 1.0), WND_ASPECT, 40);
 }
 
 GameState::GameState(const uint size, const std::vector<std::string>& field)
@@ -160,4 +165,12 @@ GameState::GameState(const char * file)
 void GameState::analize_field()
 {
 
+}
+
+void Nothing::render()
+{
+}
+
+void Wall::render()
+{
 }

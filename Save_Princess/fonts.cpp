@@ -19,7 +19,8 @@
 
 #pragma warning (disable:4996) //sprintf
 
-#define FONT_MULTIPLYER 200
+#define FONT_SIZE_REDUCTION 927
+#define FONT_WIDTH_STD 15
 
 struct Symbol
 {
@@ -87,7 +88,6 @@ void activate_font(char *file)
 	}
 	
 	textCamera = Camera();
-//	textCamera.calc_orto(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
 
 	delete[] name;
 }
@@ -98,33 +98,31 @@ TextMesh::TextMesh(int wnd_w, int wnd_h, int X, int Y, char *text, vec4 color, f
 	_mesh.clear();
 	_mesh.resize(strlen(text));
 	int i = 0;
-	GLfloat x = X - wnd_w, y = Y + wnd_h;
+	GLfloat x = X * 2 - wnd_w, y = -Y * 2 + wnd_h;
 	y -= (GLfloat)fontMap[text[0]].height / 2;
 	while (text[i] != 0)
 	{
-		x += (GLfloat)fontMap[text[i]].width / 2;
+		x += (GLfloat)fontMap[text[i]].width / 2 * scale / FONT_WIDTH_STD;
 		float chr_aspect = (GLfloat)fontMap[text[i]].width / fontMap[text[i]].height;
 		_mesh[i] = Mesh(
 			vec3((GLfloat)x / wnd_w, (GLfloat)y / wnd_h, 0),
-			vec3(scale * chr_aspect / aspect, scale, scale) / FONT_MULTIPLYER,
+			vec3(scale * chr_aspect / aspect, scale, scale) / FONT_SIZE_REDUCTION,
 			fontTex, &fontMap[text[i]].obj);
 		_mesh[i].rotate(M_PI_2, 0, 0);
 		i++;
-		x += (GLfloat)fontMap[text[i]].width / 2;
+		x += (GLfloat)fontMap[text[i]].width / 2 * scale / FONT_WIDTH_STD;
 	}
 }
 
-void TextMesh::render()
+void TextMesh::render(GLuint program, Camera &camera)
 {
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 
 	glUniform4fv(LINE_COLOR_LOC, 1, _color.v);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, fontTex);
 	glUniform1i(FONT_TEX, 0);
 	for (size_t i = 0; i < _mesh.size(); i++)
-		_mesh[i].render(textProgram, textCamera, false);
+		_mesh[i].render(program, camera, false);
 	glEnable(GL_DEPTH_TEST);
 }

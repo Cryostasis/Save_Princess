@@ -106,11 +106,10 @@ int load_bin(ObjInfo *obj, FILE *F)
 	return LS_OK;
 }
 
+#pragma warning(disable: 4996)
+
 void load_object(ObjInfo *obj, char *file)
 {
-	//ifstream ifs(file, ifstream::in);
-	//freopen(file, "r", stdin);
-
 	FILE *F;
 
 	char *File = new char[100];
@@ -283,6 +282,11 @@ int reg_object(char *file)
 ObjInfo clone_obj(char *file)
 {
 	int num = reg_object(file);
-	ObjInfo res = objects[num];
-	return res;
+	return objects[num];
+}
+
+ObjInfo* clone_obj_ptr(char *file)
+{
+	int num = reg_object(file);
+	return &objects[num];
 }

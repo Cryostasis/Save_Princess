@@ -18,6 +18,6 @@ in Vert
 
 void main(void)
 {
-	color = ln_color * texture(tex, texcrd);
+	color = texture(tex, texcrd);
 }
 ~

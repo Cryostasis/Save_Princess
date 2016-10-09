@@ -30,8 +30,6 @@ void init(int argc, char *argv[])
 
 	cout << (unsigned char*)glGetString(GL_VENDOR) << endl << (unsigned char*)glGetString(GL_RENDERER) << endl;
 
-	
-
 	glutWindow = glutGetWindow();
 	glutShowWindow();
 	glutMainLoop();

@@ -38,5 +38,6 @@ extern ObjInfo objects[MAX_OBJECTS];
 //void load_object(g_object *obj, char *file);
 int reg_object(char *file);
 ObjInfo clone_obj(char *file);
+ObjInfo* clone_obj_ptr(char *file);
 
 #endif
