@@ -31,7 +31,6 @@ void render_scene()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_BLEND);
 	glViewport(0, 0, WND_RESOLUTION[0], WND_RESOLUTION[1]);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
