@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Файлы исходного кода">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Заголовочные файлы">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{68265618-b1d4-4fb4-bea6-671676017901}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\tinyXML">
+      <UniqueIdentifier>{28218191-b421-4f9c-a11e-f685c11c10f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\tinyXML">
+      <UniqueIdentifier>{b3d81bc4-58a6-4be1-ad83-d6f630e9cc25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\openGL">
+      <UniqueIdentifier>{e2c5c732-fb14-4fae-95f4-b9fbcccb1b35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\openGL">
+      <UniqueIdentifier>{264e8c9e-d110-49a4-b7d4-8e99fc82f8d4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="winfuncs.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="file_load.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="error_log.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="save_princess.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyXML\tinystr.cpp">
+      <Filter>Файлы исходного кода\tinyXML</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyXML\tinyxml.cpp">
+      <Filter>Файлы исходного кода\tinyXML</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyXML\tinyxmlerror.cpp">
+      <Filter>Файлы исходного кода\tinyXML</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyXML\tinyxmlparser.cpp">
+      <Filter>Файлы исходного кода\tinyXML</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>Файлы исходного кода\openGL</Filter>
+    </ClCompile>
+    <ClCompile Include="fonts.cpp">
+      <Filter>Файлы исходного кода\openGL</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_vars.cpp">
+      <Filter>Файлы исходного кода\openGL</Filter>
+    </ClCompile>
+    <ClCompile Include="glerrors.cpp">
+      <Filter>Файлы исходного кода\openGL</Filter>
+    </ClCompile>
+    <ClCompile Include="init_gl.cpp">
+      <Filter>Файлы исходного кода\openGL</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh.cpp">
+      <Filter>Файлы исходного кода\openGL</Filter>
+    </ClCompile>
+    <ClCompile Include="obj_load.cpp">
+      <Filter>Файлы исходного кода\openGL</Filter>
+    </ClCompile>
+    <ClCompile Include="textures.cpp">
+      <Filter>Файлы исходного кода\openGL</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="winfuncs.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="file_load.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="error_log.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="save_princess.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyXML\tinystr.h">
+      <Filter>Заголовочные файлы\tinyXML</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyXML\tinyxml.h">
+      <Filter>Заголовочные файлы\tinyXML</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>Заголовочные файлы\openGL</Filter>
+    </ClInclude>
+    <ClInclude Include="gl_vars.h">
+      <Filter>Заголовочные файлы\openGL</Filter>
+    </ClInclude>
+    <ClInclude Include="glerrors.h">
+      <Filter>Заголовочные файлы\openGL</Filter>
+    </ClInclude>
+    <ClInclude Include="init_gl.h">
+      <Filter>Заголовочные файлы\openGL</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.h">
+      <Filter>Заголовочные файлы\openGL</Filter>
+    </ClInclude>
+    <ClInclude Include="obj_load.h">
+      <Filter>Заголовочные файлы\openGL</Filter>
+    </ClInclude>
+    <ClInclude Include="textures.h">
+      <Filter>Заголовочные файлы\openGL</Filter>
+    </ClInclude>
+    <ClInclude Include="fonts.h">
+      <Filter>Заголовочные файлы\openGL</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\text_f.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\text_v.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>
