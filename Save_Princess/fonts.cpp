@@ -19,9 +19,6 @@
 
 #pragma warning (disable:4996) //sprintf
 
-#define FONT_SIZE_REDUCTION 927
-#define FONT_WIDTH_STD 15
-
 struct Symbol
 {
 	char C;
@@ -92,25 +89,30 @@ void activate_font(char *file)
 	delete[] name;
 }
 
-TextMesh::TextMesh(int wnd_w, int wnd_h, int X, int Y, char *text, vec4 color, float aspect, float scale)
+TextMesh::TextMesh(
+	int wnd_w, int wnd_h, int X, int Y, char *text, vec4 color, float aspect, float scale)
 {
 	_color = color;
 	_mesh.clear();
 	_mesh.resize(strlen(text));
 	int i = 0;
-	GLfloat x = X * 2 - wnd_w, y = -Y * 2 + wnd_h;
-	y -= (GLfloat)fontMap[text[0]].height / 2;
+	GLfloat x = X * 2 - wnd_w + scale;
+	GLfloat y = -Y * 2 + wnd_h - scale * aspect;
+	//GLfloat x = X * 2 - wnd_w, y = -Y * 2 + wnd_h;
+	//y += (GLfloat)fontMap[text[0]].height / 2 * scale / FONT_WIDTH_STD;
+	y += scale * aspect / 2;
 	while (text[i] != 0)
 	{
-		x += (GLfloat)fontMap[text[i]].width / 2 * scale / FONT_WIDTH_STD;
-		float chr_aspect = (GLfloat)fontMap[text[i]].width / fontMap[text[i]].height;
+		//x += (GLfloat)fontMap[text[i]].width / 2 * scale / FONT_WIDTH_STD;
+		GLfloat chr_aspect = 
+			(GLfloat)fontMap[text[i]].width / (GLfloat)fontMap[text[i]].height;
 		_mesh[i] = Mesh(
 			vec3((GLfloat)x / wnd_w, (GLfloat)y / wnd_h, 0),
-			vec3(scale * chr_aspect / aspect, scale, scale) / FONT_SIZE_REDUCTION,
+			vec3(scale, scale, scale * aspect) / wnd_w,
 			fontTex, &fontMap[text[i]].obj);
 		_mesh[i].rotate(M_PI_2, 0, 0);
+		x += chr_aspect * scale * aspect * 0.75;
 		i++;
-		x += (GLfloat)fontMap[text[i]].width / 2 * scale / FONT_WIDTH_STD;
 	}
 }
 

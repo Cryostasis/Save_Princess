@@ -5,6 +5,7 @@
 
 #include <exception>
 #include <vector>
+#include <map>
 
 #include "camera.h"
 
@@ -29,108 +30,103 @@ class Monster;
 class Dragon;
 class Zombie;
 
-class GameState;
+class GameDispatcher;
 
-class FieldPoint
+class Character
 {
 public:
-	FieldPoint(uint x, uint y) : _x(x), _y(y) {};
-	virtual bool is_something() = 0;
+	Character(uint x, uint y, uint hitPoints, GLuint tex)  {};
+	virtual void your_turn(GameDispatcher& state) = 0;
 	virtual void hit(const uint hit_value) = 0;
-	virtual void your_turn(GameState& state) {};
-	virtual void render() = 0;
+	void render();
 protected:
+	GLuint _texture;
 	uint _x, _y;
-};
-
-class Nothing : public FieldPoint
-{
-public:
-	Nothing(uint x, uint y) : FieldPoint(x, y) {};
-	virtual bool is_something() { return false; };
-	virtual void render();
-};
-
-class Something : public FieldPoint
-{
-public:
-	Something(uint x, uint y) : FieldPoint(x, y) {};
-	virtual bool is_something() { return true; };
-};
-
-class Wall : public Something
-{
-public:
-	Wall(uint x, uint y) : Something(x, y) {};
-	virtual void render();
-};
-
-class Character : public Something
-{
-public:
-	Character(uint x, uint y, uint hitPoints) : Something(x, y) {};
-protected:
 	uint _hitPoints;
 };
 
 class Princess : public Character
 {
 public:
-	Princess(uint x, uint y) : Character(x, y, PRINCESS_MAX_HP) {};
-	virtual void render();
-	virtual void hit(const uint hit_value);
+	Princess(uint x, uint y, GLuint tex) : Character(x, y, PRINCESS_MAX_HP, tex) {};
+	virtual void hit(const uint hit_value) override;
+	virtual void your_turn(GameDispatcher& state) override {};
 };
 
 class Knight : public Character
 {
 public:
-	Knight(uint x, uint y) : Character(x, y, KNIGHT_MAX_HP) {};
-	virtual void your_turn(GameState& state);
+	Knight(uint x, uint y, GLuint tex) : 
+		Character(x, y, KNIGHT_MAX_HP, tex), _strength(KNIGHT_MAX_STRENGTH) {};
+	virtual void your_turn(GameDispatcher& state) override;
+	virtual void hit(const uint hit_value) override;
 protected:
-	void attack();
+	void attack(uint x, uint y);
 	uint _strength;
 };
 
 class Monster : public Character
 {
 public:
-	Monster(uint x, uint y, uint hitPoints) : Character(x, y, 0) {};
-	virtual void your_turn(GameState& state);
+	Monster(uint x, uint y, uint hitPoints, GLuint tex) : Character(x, y, hitPoints, tex) {};
 protected:
 	virtual bool check_knight() = 0;
-	virtual void attack() = 0;
+	virtual void attack(uint x, uint y) = 0;
 };
 
 class Zombie : public Monster
 {
 public:
-	Zombie(uint x, uint y) : Monster(x, y, ZOMBIE_MAX_HP) {};
+	Zombie(uint x, uint y, GLuint tex) : Monster(x, y, ZOMBIE_MAX_HP, tex) {};
+	virtual void your_turn(GameDispatcher& state) override;
+	virtual void hit(const uint hit_value) override;
 protected:
 	virtual bool check_knight();
-	virtual void attack();
+	virtual void attack(uint x, uint y);
 };
 
 class Dragon : public Monster
 {
 public:
-	Dragon(uint x, uint y) : Monster(x, y, DRAGON_MAX_HP) {};
+	Dragon(uint x, uint y, GLuint tex) : Monster(x, y, DRAGON_MAX_HP, tex) {};
+	virtual void your_turn(GameDispatcher& state) override;
+	virtual void hit(const uint hit_value) override;
 private:
 	virtual bool check_knight();
-	virtual void attack();
+	virtual void attack(uint x, uint y);
 };
 
-class GameState
+struct GameTextures
+{
+	GameTextures() : knightTex(-1), princessTex(-1), zombieTex(-1), dragonTex(-1),
+		wallTex(-1), emptyTex(-1) {};
+	GLuint knightTex, princessTex, zombieTex, dragonTex;
+	GLuint wallTex, emptyTex;
+};
+
+class GameDispatcher
 {
 public:
-	GameState() : _textField(0), _fieldSize(0) {};
-	GameState(const uint size, const  std::vector<std::string>& field);
-	GameState(const uint size, const char** field);
-	GameState(const char* file);
+	//GameState() : _field(0), _fieldSize(0) {};
+	GameDispatcher(GameTextures textures, const uint size, const  std::vector<std::string>& field);
+	GameDispatcher(GameTextures textures, const uint size, const char** field);
+	GameDispatcher(GameTextures textures, const char* file);
+	void render();
+	void hit_xy(uint x, uint y) { }
 private:
-	std::vector<std::vector<FieldPoint*>> _field;
+	std::vector<Monster*> _monsters;
+	Knight* _knight;
+	Princess* _princess;
+
+	std::map<std::pair<uint, uint>, Character*> _characterMap;
+
 	uint _fieldSize;
-	std::vector<std::string> _textField;
-	void analize_field();
+	std::vector<std::string> _field;
+	void analyze_field();
+
+	GameTextures _textures;
+
+	uint _offsetX, _offsetY;
 };
 
 void render();

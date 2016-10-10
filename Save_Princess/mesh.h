@@ -69,17 +69,27 @@ protected:
 	ObjInfo *model;
 };
 
-#define FLAT_MESH_SIZE_REDUCTION 720
-
 class FlatMesh : public Mesh
 {
 public:
 	FlatMesh(int wnd_w, int wnd_h, int x, int y, GLuint texture, float aspect, float scale) :
-		Mesh(vec3((GLfloat)(x * 2 * aspect - scale * aspect / 2) / wnd_w,
-			(GLfloat)(-y * 2 * aspect) / wnd_h, 0),
+		_wndWidth(wnd_w), _wndHeight(wnd_h), _scale(scale), _aspect(aspect), 
+		Mesh(vec3(
+				(GLfloat)(x * 2 - wnd_w + scale) / wnd_w,
+				(GLfloat)(-y * 2 * aspect + wnd_h - scale * aspect) / wnd_h, 0),
 			vec3(scale, scale, scale * aspect) / wnd_w, texture,
 			clone_obj_ptr("objects/quad.obj")) { Mesh::rotate(M_PI_2, 0, 0); };
 	void render(GLuint program, Camera &camera);
+	void move_to(int x, int y) 
+	{
+		Mesh::move_to((GLfloat)(x * 2 - _wndWidth + _scale) / _wndWidth,
+			(GLfloat)(-y * 2 * _aspect + _wndHeight - _scale * _aspect) / _wndHeight, 0);
+	};
+private:
+	int _wndWidth;
+	int _wndHeight;
+	GLfloat _scale;
+	GLfloat _aspect;
 };
 
 extern GLuint norm_tex;
