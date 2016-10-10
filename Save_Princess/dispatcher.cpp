@@ -15,6 +15,8 @@ const set<char> USED_SYMBOLS =
 const set<char> MONSTER_SYMBOLS =
 	{ CELL_DRAGON, CELL_ZOMBIE };
 
+//-------------------GAME_DISPATCHER--------------------------------------------------------------
+
 GameDispatcher::GameDispatcher(
 	GameTextures textures, const uint pxSize, const uint offsetX, const uint offsetY,
 	const uint size, const std::vector<std::string>& field) :
@@ -69,10 +71,32 @@ void GameDispatcher::hit_xy(uint x, uint y, uint damage)
 			_monsters[i]->hit(damage);
 }
 
+void GameDispatcher::hit_knight(uint damage)
+{
+	_knight->hit(damage);
+}
+
 void GameDispatcher::tact()
 {
 	for (int i = 0; i < _monsters.size(); i++)
 		_monsters[i]->your_turn();
+	_princess->check_knight();
+
+	for (int i = 0; i < _fieldSize; i++)
+		cout << _field[i] << endl;
+	cout << "\n\n\n";
+}
+
+void GameDispatcher::game_over()
+{
+	glutHideWindow();
+	cout << "\n\n======GAME OVER======\n\n";
+}
+
+void GameDispatcher::success()
+{
+	glutHideWindow();
+	cout << "\n\n======YOU WON======\n\n";
 }
 
 void GameDispatcher::prepare_field()
@@ -135,6 +159,8 @@ void GameDispatcher::render(GLuint program, Camera camera)
 	_princess->render(program, camera);
 }
 
+//-------------------CHARACTER--------------------------------------------------------------
+
 Character::Character(GameDispatcher* dispatcher, uint x, uint y, uint hitPoints, GLuint tex) :
 	_x(x), _y(y), _hitPoints(hitPoints), _look_to(DIRECTION_UP), _dispatcher(dispatcher)
 {
@@ -142,115 +168,122 @@ Character::Character(GameDispatcher* dispatcher, uint x, uint y, uint hitPoints,
 		dispatcher->get_offset_X() + x * dispatcher->get_cell_size(),
 		dispatcher->get_offset_Y() + y * dispatcher->get_cell_size(),
 		tex, WND_ASPECT, dispatcher->get_cell_size());
-};
+}
+void Character::hit(const uint hit_value)
+{
+	_hitPoints -= hit_value;
+	if (_hitPoints <= 0)
+		die();
+}
 
 void Character::render(GLuint program, Camera camera)
 {
 	_mesh->render(program, camera);
 }
-void Dragon::hit(const uint hit_value)
+
+//-------------------MOVABLE_OBJECT--------------------------------------------------------------
+
+void MovableCharacter::move(uint x, uint y)
 {
+	if (x < 0 || x >= _dispatcher->get_size() ||
+		y < 0 || y >= _dispatcher->get_size() ||
+		_dispatcher->get_cell_chr(x, y) != CELL_EMPTY)
+		return;
+	_dispatcher->set_cell_chr(_x, _y, CELL_EMPTY);
+	_x = x;
+	_y = y;
+	_dispatcher->set_cell_chr(_x, _y, get_symbol());
+	_mesh->move_to(
+		_dispatcher->get_offset_X() + _x * _dispatcher->get_cell_size(),
+		_dispatcher->get_offset_Y() + _y * _dispatcher->get_cell_size());
 }
 
-bool Dragon::check_knight()
-{
-	return false;
-}
-
-void Dragon::attack(uint x, uint y)
-{
-}
-
-void Zombie::hit(const uint hit_value)
-{
-}
-
-bool Zombie::check_knight()
-{
-	return false;
-}
-
-void Zombie::attack(uint x, uint y)
-{
-}
+//-------------------KNIGHT--------------------------------------------------------------
 
 void Knight::hit(const uint hit_value)
 {
-}
-
-void Knight::move_right(const bool attack)
-{
-	if (_x < 1 || _dispatcher->get_cell_chr(_x - 1, _y) == CELL_WALL)
-		return;
-	if (_dispatcher->get_cell_chr(_x - 1, _y) == CELL_EMPTY)
-	{
-		_dispatcher->set_cell_chr(_x, _y, CELL_EMPTY);
-		_x = _x - 1;
-		_dispatcher->set_cell_chr(_x, _y, CELL_KNIGHT);
-		_mesh->move_to(
-			_dispatcher->get_offset_X() + _x * _dispatcher->get_cell_size(),
-			_dispatcher->get_offset_Y() + _y * _dispatcher->get_cell_size());
-	}
-	if (attack && _strength >= STRENGTH_PER_ATTACK)
-	{
-		_strength -= STRENGTH_PER_ATTACK;
-		_dispatcher->hit_xy(_x - 1, _y, KNIGHT_ATTAK_POWER);
-	}
-
-	_strength += STRENGTH_REGEN;
-	_hitPoints += HP_REGEN;
-
-	_dispatcher->tact();
+	Character::hit(hit_value);
 }
 
 void Knight::move_left(const bool attack)
 {
-	
+	move_aux(attack, _x - 1, _y);
+}
+
+void Knight::move_right(const bool attack)
+{
+	move_aux(attack, _x + 1, _y - 1);
 }
 
 void Knight::move_down(const bool attack)
 {
-
+	move_aux(attack, _x, _y + 1);
 }
 
 void Knight::move_up(const bool attack)
 {
-	if (_y < 1 || _dispatcher->get_cell_chr(_x, _y - 1) == CELL_WALL)
-		return;
-	if (_dispatcher->get_cell_chr(_x, _y - 1) == CELL_EMPTY)
-	{
-		_dispatcher->set_cell_chr(_x, _y, CELL_EMPTY);
-		_y = _y - 1;
-		_dispatcher->set_cell_chr(_x, _y, CELL_KNIGHT);
-		_mesh->move_to(
-			_dispatcher->get_offset_X() + _x * _dispatcher->get_cell_size(),
-			_dispatcher->get_offset_Y() + _y * _dispatcher->get_cell_size());
-	}
-	if (attack && _strength >= STRENGTH_PER_ATTACK)
-	{
-		_strength -= STRENGTH_PER_ATTACK;
-		_dispatcher->hit_xy(_x, _y - 1, KNIGHT_ATTAK_POWER);
-	}
-
-	_strength += STRENGTH_REGEN;
-	_hitPoints += HP_REGEN;
+	move_aux(attack, _x, _y - 1);
 }
 
 void Knight::attack_forward()
 {
+
+}
+
+void Knight::die()
+{
+	_dispatcher->game_over();
+}
+
+void Knight::tact()
+{
+	_strength = min(_strength + STRENGTH_REGEN, KNIGHT_MAX_STRENGTH);
+	_hitPoints = min(_hitPoints + HP_REGEN, KNIGHT_MAX_HP);
+}
+
+void Knight::move_aux(const bool doAttack, const uint x, const uint y)
+{
+	move(x, y);
+	if (1 && _strength >= STRENGTH_PER_ATTACK)
+	{
+		_strength -= STRENGTH_PER_ATTACK;
+		attack(x, y);
+	}
+	tact();
 }
 
 void Knight::attack(uint x, uint y)
 {
-
+	_dispatcher->hit_xy(x, y, KNIGHT_ATTAK_POWER);
 }
+
+//-------------------PRINCESS--------------------------------------------------------------
 
 void Princess::hit(const uint hit_value)
 {
+	Character::hit(hit_value);
 }
+
+void Princess::check_knight()
+{
+	if ((_x > 0 && _dispatcher->get_cell_chr(_x - 1, _y) == CELL_KNIGHT) ||
+		(_x < _dispatcher->get_size() - 1 && _dispatcher->get_cell_chr(_x + 1, _y) == CELL_KNIGHT) ||
+		(_y > 0 && _dispatcher->get_cell_chr(_x, _y - 1) == CELL_KNIGHT) ||
+		(_y < _dispatcher->get_size() - 1 && _dispatcher->get_cell_chr(_x, _y + 1) == CELL_KNIGHT))
+		_dispatcher->success();
+}
+
+void Princess::die()
+{
+	_dispatcher->game_over();
+}
+
+//-------------------MONSTER--------------------------------------------------------------
 
 void Monster::your_turn()
 {
+	if (!_isAlive)
+		return;
 	bool flag = false;
 	queue<pair<uint, uint>> q;
 	q.push({_x, _y});
@@ -315,16 +348,28 @@ void Monster::your_turn()
 		return;
 	}
 
-	_dispatcher->set_cell_chr(_x, _y, CELL_EMPTY);
-	_x = v.first;
-	_y = v.second;
-	_dispatcher->set_cell_chr(_x, _y, get_symbol());
-	_mesh->move_to(
-		_dispatcher->get_offset_X() + _x * _dispatcher->get_cell_size(),
-		_dispatcher->get_offset_Y() + _y * _dispatcher->get_cell_size());
+	move(v.first, v.second);
 
 	if (abs((int)knight.first - (int)_x) + abs((int)knight.second - (int)_y) == 1)
 		attack(knight.first, knight.second);
+}
+
+void Monster::render(GLuint program, Camera camera)
+{
+	if (_isAlive)
+		Character::render(program, camera);
+}
+
+void Monster::hit(const uint hit_value)
+{
+	if (_isAlive)
+		Character::hit(hit_value);
+}
+
+void Monster::die()
+{
+	_isAlive = false;
+	_dispatcher->set_cell_chr(_x, _y, CELL_EMPTY);
 }
 
 bool Monster::bfs_aux(
@@ -342,4 +387,18 @@ bool Monster::bfs_aux(
 		return true;
 	}
 	return false;
+}
+
+//-------------------DRAGON--------------------------------------------------------------
+
+void Dragon::attack(uint x, uint y)
+{
+	_dispatcher->hit_knight(DRAGON_ATTAK_POWER);
+}
+
+//-------------------ZOMBIE--------------------------------------------------------------
+
+void Zombie::attack(uint x, uint y)
+{
+	_dispatcher->hit_knight(ZOMBIE_ATTAK_POWER);
 }

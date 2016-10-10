@@ -18,7 +18,7 @@ using namespace std;
 const vector<string> testField =
 {
 	"P...",
-	"#.##",
+	"#.#.",
 	"..#.",
 	"ZD.K"
 };
@@ -45,6 +45,7 @@ void register_textures()
 
 void render()
 {
+	SetFocus(GetConsoleWindow());
 	glUseProgram(textProgram);
 
 	mainDispatcher->render(textProgram, textCamera);
@@ -105,6 +106,9 @@ void on_press_spec_key(int key, int x, int y)
 	switch (key)
 	{
 	case GLUT_KEY_UP: { mainDispatcher->go_up(false); break; }
+	case GLUT_KEY_DOWN: { mainDispatcher->go_down(false); break; }
+	case GLUT_KEY_RIGHT: { mainDispatcher->go_right(false); break; }
+	case GLUT_KEY_LEFT: { mainDispatcher->go_left(false); break; }
 
 	}
 }

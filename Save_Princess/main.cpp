@@ -23,6 +23,7 @@ void init(int argc, char *argv[])
 	setlocale(LC_ALL, "Russian");
 
 	create_console();
+	
 	main_gl_init(argc, argv);
 
 	activate_font("textures/font");
@@ -51,5 +52,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	LocalFree(lpArgv);
 
 	init(argc, argv);
+
 	return 0;
 }
