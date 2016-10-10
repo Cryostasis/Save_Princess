@@ -5,10 +5,10 @@
 
 #include "camera.h"
 
-const int WND_RESOLUTION[2] = { 1280, 720 };
-const int WND_POSITION[2] = { 70, 0 };
+const int WND_RES[2] = { 1280, 720 };
+const int WND_POS[2] = { 70, 0 };
 const int TIMER_TICKS = 1;
-const GLfloat WND_ASPECT = (float)WND_RESOLUTION[0] / (float)WND_RESOLUTION[1];
+const GLfloat WND_ASPECT = (float)WND_RES[0] / (float)WND_RES[1];
 
 extern GLuint mainProgram;
 extern GLuint textProgram;

@@ -185,8 +185,8 @@ int main_gl_init(int argc, char *argv[])
 	glutInit(&k, 0);
 	//glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitWindowSize(WND_RESOLUTION[0], WND_RESOLUTION[1]);
-	glutInitWindowPosition(WND_POSITION[0], WND_POSITION[1]);
+	glutInitWindowSize(WND_RES[0], WND_RES[1]);
+	glutInitWindowPosition(WND_POS[0], WND_POS[1]);
 	glutCreateWindow("SOSIPISOS");
 	glutHideWindow();
 
@@ -202,13 +202,13 @@ int main_gl_init(int argc, char *argv[])
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	/*glutKeyboardFunc(on_press_key);
+	glutKeyboardFunc(on_press_key);
 	glutSpecialFunc(on_press_spec_key);
 	glutKeyboardUpFunc(on_up_key);
 	glutSpecialUpFunc(on_up_spec_key);
 	glutMotionFunc(on_mouse_move);
 	glutPassiveMotionFunc(on_mouse_move);
-	glutMouseFunc(on_mouse_click);*/
+	glutMouseFunc(on_mouse_click);
 
 	//glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 

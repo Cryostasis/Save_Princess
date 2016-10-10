@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="dispatcher.cpp" />
     <ClCompile Include="error_log.cpp" />
     <ClCompile Include="file_load.cpp" />
     <ClCompile Include="fonts.cpp" />
@@ -168,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
+    <ClInclude Include="dispatcher.h" />
     <ClInclude Include="error_log.h" />
     <ClInclude Include="fonts.h" />
     <ClInclude Include="glerrors.h" />

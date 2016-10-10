@@ -77,6 +77,9 @@
     <ClCompile Include="textures.cpp">
       <Filter>Файлы исходного кода\openGL</Filter>
     </ClCompile>
+    <ClCompile Include="dispatcher.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="winfuncs.h">
@@ -120,6 +123,9 @@
     </ClInclude>
     <ClInclude Include="fonts.h">
       <Filter>Заголовочные файлы\openGL</Filter>
+    </ClInclude>
+    <ClInclude Include="dispatcher.h">
+      <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
