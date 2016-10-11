@@ -80,6 +80,7 @@ public:
 			vec3(scale, scale, scale * aspect) / wnd_w, texture,
 			clone_obj_ptr("objects/quad.obj")) { Mesh::rotate(M_PI_2, 0, 0); };
 	void render(GLuint program, Camera &camera);
+	void set_texture(GLuint tex);
 	void move_to(int x, int y) 
 	{
 		Mesh::move_to((GLfloat)(x * 2 - _wndWidth + _scale) / _wndWidth,

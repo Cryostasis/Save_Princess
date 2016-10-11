@@ -280,6 +280,38 @@ void Princess::die()
 
 //-------------------MONSTER--------------------------------------------------------------
 
+bool Monster::bfs_aux_check(
+	pair<uint, uint> v, pair<uint, uint> to, set<pair<uint, uint>>& used, 
+	map<pair<uint, uint>, pair<uint, uint>>& p, map<pair<uint, uint>, int>& d, 
+	queue<pair<uint, uint>>& q, pair<uint, uint>& knight)
+{
+	if (to.first < 0 || to.second < 0 ||
+		to.first >= _dispatcher->get_size() ||
+		to.second >= _dispatcher->get_size())
+		return false;
+	if ((_dispatcher->get_cell_chr(to.first, to.second) == CELL_EMPTY
+			|| _dispatcher->get_cell_chr(to.first, to.second) == CELL_KNIGHT)
+		&& used.find(to) == used.end())
+		return bfs_aux_step(v, to, used, p, d, q, knight);
+}
+
+bool Monster::bfs_aux_step(
+	pair<uint, uint> v, pair<uint, uint> to, set<pair<uint, uint>>& used,
+	map<pair<uint, uint>, pair<uint, uint>>& p, map<pair<uint, uint>, int>& d,
+	queue<pair<uint, uint>>& q, pair<uint, uint>& knight)
+{
+	used.insert(to);
+	q.push(to);
+	d[to] = d[v] + 1;
+	p[to] = v;
+	if (_dispatcher->get_cell_chr(to.first, to.second) == CELL_KNIGHT)
+	{
+		knight = to;
+		return true;
+	}
+	return false;
+}
+
 void Monster::your_turn()
 {
 	if (!_isAlive)
@@ -292,9 +324,6 @@ void Monster::your_turn()
 	set<pair<uint, uint>> used;
 	pair<uint, uint> knight = { UINT_MAX , UINT_MAX };
 
-	//vector<vector<bool>> used(sz);
-	//for (int i = 0; i < sz; i++)
-	//	used[i].resize(sz);
 	map<pair<uint, uint>, int> d;
 	map<pair<uint, uint>, pair<uint, uint>> p;
 	used.insert({_x, _y});
@@ -304,29 +333,12 @@ void Monster::your_turn()
 	{
 		pair<uint, uint> v = q.front();
 		q.pop();
-		if (v.first > 0 && 
-			(_dispatcher->get_cell_chr(v.first - 1, v.second) == CELL_EMPTY
-			|| _dispatcher->get_cell_chr(v.first - 1, v.second) == CELL_KNIGHT)
-			&& used.find({ v.first - 1, v.second }) == used.end())
-			flag = flag || bfs_aux(v, { v.first - 1, v.second }, used, p, d, q, knight);
 
-		if (v.first < sz - 1 && 
-			(_dispatcher->get_cell_chr(v.first + 1, v.second) == CELL_EMPTY
-			|| _dispatcher->get_cell_chr(v.first + 1, v.second) == CELL_KNIGHT)
-			&& used.find({ v.first + 1, v.second }) == used.end())
-			flag = flag || bfs_aux(v, { v.first + 1, v.second }, used, p, d, q, knight);
-
-		if (v.second > 0 && 
-			(_dispatcher->get_cell_chr(v.first, v.second - 1) == CELL_EMPTY
-			|| _dispatcher->get_cell_chr(v.first, v.second - 1) == CELL_KNIGHT)
-			&& used.find({ v.first, v.second - 1 }) == used.end())
-			flag = flag || bfs_aux(v, { v.first, v.second - 1 }, used, p, d, q, knight);
-
-		if (v.second < sz - 1 && 
-			(_dispatcher->get_cell_chr(v.first, v.second + 1) == CELL_EMPTY
-			|| _dispatcher->get_cell_chr(v.first, v.second + 1) == CELL_KNIGHT)
-			&& used.find({ v.first, v.second + 1 }) == used.end())
-			flag = flag || bfs_aux(v, { v.first, v.second + 1 }, used, p, d, q, knight);
+		flag = flag || 
+			bfs_aux_check(v, { v.first - 1, v.second }, used, p, d, q, knight) ||
+			bfs_aux_check(v, { v.first + 1, v.second }, used, p, d, q, knight) || 
+			bfs_aux_check(v, { v.first, v.second + 1 }, used, p, d, q, knight) || 
+			bfs_aux_check(v, { v.first, v.second - 1 }, used, p, d, q, knight);
 	}
 
 	if (!flag)
@@ -370,23 +382,6 @@ void Monster::die()
 {
 	_isAlive = false;
 	_dispatcher->set_cell_chr(_x, _y, CELL_EMPTY);
-}
-
-bool Monster::bfs_aux(
-	pair<uint, uint> v, pair<uint, uint> to, set<pair<uint, uint>>& used, 
-	map<pair<uint, uint>, pair<uint, uint>>& p, map<pair<uint, uint>, int>& d, 
-	queue<pair<uint, uint>>& q, pair<uint, uint>& knight)
-{
-	used.insert(to);
-	q.push(to);
-	d[to] = d[v] + 1;
-	p[to] = v;
-	if (_dispatcher->get_cell_chr(to.first, to.second) == CELL_KNIGHT)
-	{
-		knight = to;
-		return true;
-	}
-	return false;
 }
 
 //-------------------DRAGON--------------------------------------------------------------

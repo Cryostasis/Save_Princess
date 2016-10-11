@@ -8,10 +8,12 @@
 #include <map>
 #include <set>
 #include <queue>
+#include <sstream>
 
 #include "camera.h"
 #include "gl_vars.h"
 #include "mesh.h"
+#include "fonts.h"
 
 using namespace std;
 
@@ -22,7 +24,7 @@ typedef unsigned int uint;
 #define HP_REGEN 2
 
 #define KNIGHT_MAX_STRENGTH 10
-#define KNIGHT_MAX_HP 150
+#define KNIGHT_MAX_HP 12
 #define KNIGHT_ATTAK_POWER 3
 
 #define PRINCESS_MAX_HP 1
@@ -42,6 +44,9 @@ typedef unsigned int uint;
 #define CELL_WALL '#'
 #define CELL_PRINCESS 'P'
 
+#define HP_TEXT_PRECENT 20
+const vec4 HP_TEXT_COLOR = {1.0, 0.0, 0.0, 1.0};
+
 class Character;
 class Knight;
 class Princess;
@@ -52,6 +57,32 @@ class Zombie;
 class GameDispatcher;
 
 enum DIRECTION { DIRECTION_UP, DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT };
+
+class CellMesh
+{
+public:
+	CellMesh(uint offsetX, uint offsetY, uint x, uint y, uint cellSize) {};
+protected:
+	uint _offsetX, _offsetY;
+	uint _x, _y;
+	uint _cellSize;
+	FlatMesh _mesh;
+	vector<vector<GLuint>> textures;
+};
+
+class CellMeshHP : public CellMesh
+{
+public:
+	CellMeshHP(uint offsetX, uint offsetY, uint x, uint y, uint cellSize, uint hp ) :
+		CellMesh(offsetX, offsetY, x, y, cellSize), _hpStr(),
+		_text(WND_RES[0], WND_RES[1], offsetX + cellSize * x, offsetY + cellSize * y,
+			static_cast<ostringstream*>(&(ostringstream() << hp))->str(), HP_TEXT_COLOR,
+			WND_ASPECT, HP_TEXT_PRECENT / 100 * cellSize) {};
+private:
+	string _hpStr;
+	uint _hp;
+	TextMesh _text;
+};
 
 class Character
 {
@@ -128,9 +159,13 @@ protected:
 	virtual void die() override;
 	virtual void attack(uint x, uint y) = 0;
 private:
-	bool bfs_aux(
+	bool bfs_aux_step(
 		pair<uint, uint> v, pair<uint, uint> to, set<pair<uint, uint>>& used, 
 		map<pair<uint, uint>, pair<uint, uint>>& p, map<pair<uint, uint>, int>& d, 
+		queue<pair<uint, uint>>& q, pair<uint, uint>& knight);
+	bool bfs_aux_check(
+		pair<uint, uint> v, pair<uint, uint> to, set<pair<uint, uint>>& used,
+		map<pair<uint, uint>, pair<uint, uint>>& p, map<pair<uint, uint>, int>& d,
 		queue<pair<uint, uint>>& q, pair<uint, uint>& knight);
 };
 
@@ -139,7 +174,6 @@ class Zombie : public Monster
 public:
 	Zombie(GameDispatcher* dispatcher, uint x, uint y, GLuint tex) :
 		Monster(dispatcher, x, y, ZOMBIE_MAX_HP, tex) {};
-	//virtual void your_turn()) override;
 protected:
 	virtual char get_symbol() override { return CELL_ZOMBIE; };
 private:
@@ -218,6 +252,7 @@ private:
 	uint _offsetX, _offsetY;
 	uint _sizeInPixels;
 };
+
 /*
 class GameInterface
 {

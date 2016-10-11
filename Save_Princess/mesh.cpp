@@ -205,3 +205,8 @@ void FlatMesh::render(GLuint program, Camera & camera)
 
 	glEnable(GL_DEPTH_TEST);
 }
+
+void FlatMesh::set_texture(GLuint tex)
+{
+	texture = tex;
+}
