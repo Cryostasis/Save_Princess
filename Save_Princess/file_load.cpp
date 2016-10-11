@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#pragma warning(disable: 4473)
+#pragma warning(disable: 4996)
+
 int load_file(char *name, bool binary, bool strict, char **buffer)
 {
 	FILE *f_in;

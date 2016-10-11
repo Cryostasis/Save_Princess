@@ -72,7 +72,8 @@ protected:
 class FlatMesh : public Mesh
 {
 public:
-	FlatMesh(int wnd_w, int wnd_h, int x, int y, GLuint texture, float aspect, float scale) :
+	FlatMesh(const int wnd_w, const int wnd_h, const int x, const int y, const GLuint texture, 
+		const float aspect, const float scale) :
 		_wndWidth(wnd_w), _wndHeight(wnd_h), _scale(scale), _aspect(aspect), 
 		Mesh(vec3(
 				(GLfloat)(x * 2 - wnd_w + scale) / wnd_w,

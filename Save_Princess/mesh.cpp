@@ -195,11 +195,14 @@ void Mesh::look_at_dir(vec3 pos, vec3 dir, vec3 up)
 	rotation = GLLookAt(pos, pos + dir, up);
 }
 
+const vec4 vec4_1 = vec4(1.0, 1.0, 1.0, 1.0);
+
 void FlatMesh::render(GLuint program, Camera & camera)
 {
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 
+	glUniform4fv(LINE_COLOR_LOC, 1, vec4_1.v);
 	glUniform1i(FONT_TEX, 0);
 	Mesh::render(program, camera, false);
 
