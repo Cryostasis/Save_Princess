@@ -58,26 +58,41 @@ class GameDispatcher;
 
 enum DIRECTION { DIRECTION_UP, DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT };
 
-class CellMesh
+using textures_ptr = vector<vector<GLuint>>*;
+
+class AnimatedMesh
 {
 public:
-	CellMesh(uint offsetX, uint offsetY, uint x, uint y, uint cellSize) {};
+	virtual void render(const GLuint program, Camera camera) { _mesh.render(program, camera); };
+	AnimatedMesh(const uint x, const uint y, textures_ptr textures, const float scale) :
+		_mesh(WND_RES[0], WND_RES[1], x, y, (*textures)[0][0], WND_ASPECT, scale), _textures(textures) {};
 protected:
+	FlatMesh _mesh;
+	uint _cellSize;
+	textures_ptr _textures;
+};
+
+class CellMesh : public AnimatedMesh
+{
+public:
+	CellMesh(const uint offsetX, const uint offsetY, const uint x, const uint y, const uint cellSize, 
+		textures_ptr textures) : 
+		AnimatedMesh(x * cellSize + offsetX, y * cellSize + offsetY, textures, cellSize), _cellSize(cellSize),
+		_offsetX(offsetX), _offsetY(offsetY), _x(x), _y(y) {};
+	virtual void move_to(const uint x, const uint y) { _mesh.move_to(x * _cellSize + _offsetX, y * _cellSize + _offsetY); }
+protected:
+	uint _cellSize;
 	uint _offsetX, _offsetY;
 	uint _x, _y;
-	uint _cellSize;
-	FlatMesh _mesh;
-	vector<vector<GLuint>> textures;
 };
 
 class CellMeshHP : public CellMesh
 {
 public:
-	CellMeshHP(uint offsetX, uint offsetY, uint x, uint y, uint cellSize, uint hp ) :
-		CellMesh(offsetX, offsetY, x, y, cellSize), _hpStr(),
-		_text(WND_RES[0], WND_RES[1], offsetX + cellSize * x, offsetY + cellSize * y,
-			static_cast<ostringstream*>(&(ostringstream() << hp))->str(), HP_TEXT_COLOR,
-			WND_ASPECT, HP_TEXT_PRECENT / 100 * cellSize) {};
+	virtual void render(const GLuint program, Camera camera) override;
+	CellMeshHP(const uint offsetX, const uint offsetY, const uint x, const uint y, const uint cellSize, uint hp,
+		textures_ptr textures);
+	virtual void move_to(const uint x, const uint y) override;
 private:
 	string _hpStr;
 	uint _hp;
@@ -87,9 +102,9 @@ private:
 class Character
 {
 public:
-	Character(GameDispatcher* dispatcher, uint x, uint y, uint hitPoints, GLuint tex);
+	Character(GameDispatcher* dispatcher, const uint x, const uint y, const uint hitPoints, textures_ptr tex);
 	virtual void hit(const uint hit_value);
-	virtual void render(GLuint program, Camera camera);
+	virtual void render(const GLuint program, Camera camera);
 protected:
 	virtual void die() = 0;
 	virtual char get_symbol() = 0;
@@ -98,14 +113,14 @@ protected:
 	uint _x;
 	uint _y;
 	int _hitPoints;
-	FlatMesh* _mesh;
+	CellMeshHP _mesh;
 	DIRECTION _look_to;
 };
 
 class Princess : public Character
 {
 public:
-	Princess(GameDispatcher* dispatcher, uint x, uint y, GLuint tex) :
+	Princess(GameDispatcher* dispatcher, const uint x, const uint y, textures_ptr tex) :
 		Character(dispatcher, x, y, PRINCESS_MAX_HP, tex) {};
 	virtual void hit(const uint hit_value) override;
 	void check_knight();
@@ -117,16 +132,16 @@ protected:
 class MovableCharacter : public Character
 {
 public:
-	MovableCharacter(GameDispatcher* dispatcher, uint x, uint y, uint hitPoints, GLuint tex) :
+	MovableCharacter(GameDispatcher* dispatcher, const uint x, const uint y, const uint hitPoints, textures_ptr tex) :
 		Character(dispatcher, x, y, hitPoints, tex) {};
 protected:
-	void move(uint x, uint y);
+	void move(const uint x, const uint y);
 };
 
 class Knight : public MovableCharacter
 {
 public:
-	Knight(GameDispatcher* dispatcher, uint x, uint y, GLuint tex) :
+	Knight(GameDispatcher* dispatcher, const uint x, const uint y, textures_ptr tex) :
 		MovableCharacter(dispatcher, x, y, KNIGHT_MAX_HP, tex), _strength(KNIGHT_MAX_STRENGTH) {};
 	virtual void hit(const uint hit_value) override;
 	void move_up(const bool attack);
@@ -140,14 +155,14 @@ protected:
 private:
 	void tact();
 	void move_aux(const bool attack, const uint x, const uint y);
-	void attack(uint x, uint y);
+	void attack(const uint x, const uint y);
 	uint _strength;
 };
 
 class Monster : public MovableCharacter
 {
 public:
-	Monster(GameDispatcher* dispatcher, uint x, uint y, uint hitPoints, GLuint tex) :
+	Monster(GameDispatcher* dispatcher, const uint x, const uint y, const uint hitPoints, textures_ptr tex) :
 		MovableCharacter(dispatcher, x, y, hitPoints, tex) { _isAlive = true; };
 	void your_turn();
 	pair<uint, uint> get_coords() { return {_x, _y}; };
@@ -157,7 +172,7 @@ public:
 protected:
 	bool _isAlive;
 	virtual void die() override;
-	virtual void attack(uint x, uint y) = 0;
+	virtual void attack(const uint x, const uint y) = 0;
 private:
 	bool bfs_aux_step(
 		pair<uint, uint> v, pair<uint, uint> to, set<pair<uint, uint>>& used, 
@@ -172,32 +187,32 @@ private:
 class Zombie : public Monster
 {
 public:
-	Zombie(GameDispatcher* dispatcher, uint x, uint y, GLuint tex) :
+	Zombie(GameDispatcher* dispatcher, const uint x, const uint y, textures_ptr tex) :
 		Monster(dispatcher, x, y, ZOMBIE_MAX_HP, tex) {};
 protected:
 	virtual char get_symbol() override { return CELL_ZOMBIE; };
 private:
-	virtual void attack(uint x, uint y);
+	virtual void attack(const uint x, const uint y);
 };
 
 class Dragon : public Monster
 {
 public:
-	Dragon(GameDispatcher* dispatcher, uint x, uint y, GLuint tex) :
+	Dragon(GameDispatcher* dispatcher, const uint x, const uint y, textures_ptr tex) :
 		Monster(dispatcher, x, y, DRAGON_MAX_HP, tex) {};
 	//virtual void your_turn()) override;
 protected:
 	virtual char get_symbol() override { return CELL_DRAGON; };
 private:
-	virtual void attack(uint x, uint y);
+	virtual void attack(const uint x, const uint y);
 };
 
 struct GameTextures
 {
-	GameTextures() : knightTex(-1), princessTex(-1), zombieTex(-1), dragonTex(-1),
-		wallTex(-1), emptyTex(-1), borderTex(-1) {};
-	GLuint knightTex, princessTex, zombieTex, dragonTex;
-	GLuint wallTex, emptyTex, borderTex;
+	GameTextures() : knightTex(0), princessTex(0), zombieTex(0), dragonTex(0),
+		wallTex(0), emptyTex(0), borderTex(0) {};
+	vector<vector<GLuint>> knightTex, princessTex, zombieTex, dragonTex;
+	vector<vector<GLuint>> wallTex, emptyTex, borderTex;
 };
 
 class GameDispatcher
@@ -237,9 +252,9 @@ private:
 	Knight* _knight;
 	Princess* _princess;
 
-	FlatMesh* _emptyMesh;
-	FlatMesh* _border;
-	vector<FlatMesh*> _walls;
+	AnimatedMesh* _emptyMesh;
+	AnimatedMesh* _border;
+	vector<AnimatedMesh*> _walls;
 
 	map<pair<uint, uint>, Character*> _characterMap;
 

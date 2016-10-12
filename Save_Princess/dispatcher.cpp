@@ -114,23 +114,23 @@ void GameDispatcher::prepare_field()
 			{
 				if (++knightCnt > 1)
 					throw std::exception("Too many knights");
-				_knight = new Knight(this, j, i, _textures.knightTex);
+				_knight = new Knight(this, j, i, &_textures.knightTex);
 				break;
 			}
 			case CELL_PRINCESS:
 			{
 				if (++princessCnt > 1)
 					throw std::exception("Too many princesses");
-				_princess = new Princess(this, j, i, _textures.princessTex);
+				_princess = new Princess(this, j, i, &_textures.princessTex);
 				break;
 			}
-			case CELL_DRAGON: { _monsters.push_back(new Dragon(this, j, i, _textures.dragonTex)); break; }
-			case CELL_ZOMBIE: { _monsters.push_back(new Zombie(this, j, i, _textures.zombieTex)); break; }
+			case CELL_DRAGON: { _monsters.push_back(new Dragon(this, j, i, &_textures.dragonTex)); break; }
+			case CELL_ZOMBIE: { _monsters.push_back(new Zombie(this, j, i, &_textures.zombieTex)); break; }
 			case CELL_WALL:
 			{
-				_walls.push_back(new FlatMesh(WND_RES[0], WND_RES[1],
+				_walls.push_back(new AnimatedMesh(
 					j * get_cell_size() + _offsetX, i * get_cell_size() + _offsetY,
-					_textures.wallTex, WND_ASPECT, get_cell_size()));
+					&_textures.wallTex, get_cell_size()));
 				break;
 			}
 			default:
@@ -140,10 +140,10 @@ void GameDispatcher::prepare_field()
 	if (knightCnt != 1 || princessCnt != 1)
 		throw std::exception("wrong field");
 
-	_emptyMesh = new FlatMesh(WND_RES[0], WND_RES[1], _offsetX, _offsetY, _textures.emptyTex, WND_ASPECT, _sizeInPixels);
-	_border = new FlatMesh(WND_RES[0], WND_RES[1],
+	_emptyMesh = new AnimatedMesh(_offsetX, _offsetY, &_textures.emptyTex, _sizeInPixels);
+	_border = new AnimatedMesh(
 		_offsetX - BORDER_W_PCNT * _sizeInPixels / 100, _offsetY - BORDER_W_PCNT * _sizeInPixels / 100,
-		_textures.borderTex, WND_ASPECT, _sizeInPixels * (100 + BORDER_W_PCNT * 2) / 100);
+		&_textures.borderTex, _sizeInPixels * (100 + BORDER_W_PCNT * 2) / 100);
 }
 
 void GameDispatcher::render(GLuint program, Camera camera)
@@ -161,13 +161,10 @@ void GameDispatcher::render(GLuint program, Camera camera)
 
 //-------------------CHARACTER--------------------------------------------------------------
 
-Character::Character(GameDispatcher* dispatcher, uint x, uint y, uint hitPoints, GLuint tex) :
-	_x(x), _y(y), _hitPoints(hitPoints), _look_to(DIRECTION_UP), _dispatcher(dispatcher)
+Character::Character(GameDispatcher* dispatcher, const uint x, const uint y, const uint hitPoints, textures_ptr textures) :
+	_x(x), _y(y), _hitPoints(hitPoints), _look_to(DIRECTION_UP), _dispatcher(dispatcher),
+	_mesh(dispatcher->get_offset_X(), dispatcher->get_offset_Y(), x, y, dispatcher->get_cell_size(), hitPoints, textures)
 {
-	_mesh = new FlatMesh(WND_RES[0], WND_RES[1],
-		dispatcher->get_offset_X() + x * dispatcher->get_cell_size(),
-		dispatcher->get_offset_Y() + y * dispatcher->get_cell_size(),
-		tex, WND_ASPECT, dispatcher->get_cell_size());
 }
 void Character::hit(const uint hit_value)
 {
@@ -178,12 +175,12 @@ void Character::hit(const uint hit_value)
 
 void Character::render(GLuint program, Camera camera)
 {
-	_mesh->render(program, camera);
+	_mesh.render(program, camera);
 }
 
 //-------------------MOVABLE_OBJECT--------------------------------------------------------------
 
-void MovableCharacter::move(uint x, uint y)
+void MovableCharacter::move(const uint x, const uint y)
 {
 	if (x < 0 || x >= _dispatcher->get_size() ||
 		y < 0 || y >= _dispatcher->get_size() ||
@@ -193,9 +190,7 @@ void MovableCharacter::move(uint x, uint y)
 	_x = x;
 	_y = y;
 	_dispatcher->set_cell_chr(_x, _y, get_symbol());
-	_mesh->move_to(
-		_dispatcher->get_offset_X() + _x * _dispatcher->get_cell_size(),
-		_dispatcher->get_offset_Y() + _y * _dispatcher->get_cell_size());
+	_mesh.move_to(x, y);
 }
 
 //-------------------KNIGHT--------------------------------------------------------------
@@ -212,7 +207,7 @@ void Knight::move_left(const bool attack)
 
 void Knight::move_right(const bool attack)
 {
-	move_aux(attack, _x + 1, _y - 1);
+	move_aux(attack, _x + 1, _y);
 }
 
 void Knight::move_down(const bool attack)
@@ -252,7 +247,7 @@ void Knight::move_aux(const bool doAttack, const uint x, const uint y)
 	tact();
 }
 
-void Knight::attack(uint x, uint y)
+void Knight::attack(const uint x, const uint y)
 {
 	_dispatcher->hit_xy(x, y, KNIGHT_ATTAK_POWER);
 }
@@ -386,14 +381,48 @@ void Monster::die()
 
 //-------------------DRAGON--------------------------------------------------------------
 
-void Dragon::attack(uint x, uint y)
+void Dragon::attack(const uint x, const uint y)
 {
 	_dispatcher->hit_knight(DRAGON_ATTAK_POWER);
 }
 
 //-------------------ZOMBIE--------------------------------------------------------------
 
-void Zombie::attack(uint x, uint y)
+void Zombie::attack(const uint x, const uint y)
 {
 	_dispatcher->hit_knight(ZOMBIE_ATTAK_POWER);
 }
+
+//-------------------CellMeshHP--------------------------------------------------------------
+
+inline string itos(const int i)
+{
+	return string(static_cast<ostringstream*>(&(ostringstream() << i))->str());
+}
+
+void CellMeshHP::render(const GLuint program, Camera camera)
+{
+	AnimatedMesh::render(program, camera); 
+	_text.render(program, camera); 
+}
+
+CellMeshHP::CellMeshHP(const uint offsetX, const uint offsetY, const uint x, const uint y, const uint cellSize,
+	uint hp, textures_ptr textures) :
+	CellMesh(offsetX, offsetY, x, y, cellSize, textures), _hpStr(),
+	_text(WND_RES[0], WND_RES[1], offsetX + cellSize * x, offsetY + cellSize * y,
+		itos(hp).c_str(), HP_TEXT_COLOR,
+		WND_ASPECT, (GLfloat)HP_TEXT_PRECENT / 100 * cellSize)
+{
+
+}
+
+void CellMeshHP::move_to(const uint x, const uint y)
+{
+	CellMesh::move_to(x, y);
+	_text.move_to(_offsetX + _cellSize * x, _offsetY + _cellSize * y);
+}
+
+
+
+
+

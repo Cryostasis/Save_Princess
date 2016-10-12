@@ -89,10 +89,16 @@ void activate_font(char *file)
 	delete[] name;
 }
 
-TextMesh::TextMesh(
-	int wnd_w, int wnd_h, int X, int Y, char *text, vec4 color, float aspect, float scale)
+TextMesh::TextMesh(const int wnd_w, const int wnd_h, const int X, const int Y, const char *text,
+	const vec4 color, const float aspect, const float scale)
 {
+	_text = text;
 	_color = color;
+	_wndH = wnd_h;
+	_wndW = wnd_w;
+	_aspect = aspect;
+	_scale = scale;
+
 	_mesh.clear();
 	_mesh.resize(strlen(text));
 	int i = 0;
@@ -111,8 +117,22 @@ TextMesh::TextMesh(
 			vec3(scale, scale, scale * aspect) / wnd_w,
 			fontTex, &fontMap[text[i]].obj);
 		_mesh[i].rotate(M_PI_2, 0, 0);
-		x += chr_aspect * scale * aspect * 0.75;
+		x += chr_aspect * scale / chr_aspect;
 		i++;
+	}
+}
+
+void TextMesh::move_to(int X, int Y)
+{
+	GLfloat x = X * 2 - _wndW + _scale;
+	GLfloat y = -Y * 2 + _wndH - _scale * _aspect;
+	y += _scale * _aspect / 2;
+	for (int i = 0; i < _mesh.size(); i++)
+	{
+		GLfloat chr_aspect =
+			(GLfloat)fontMap[_text[i]].width / (GLfloat)fontMap[_text[i]].height;
+		_mesh[i].move_to(vec3((GLfloat)x / _wndW, (GLfloat)y / _wndH, 0));
+		x += chr_aspect * _scale / chr_aspect;
 	}
 }
 
@@ -128,3 +148,5 @@ void TextMesh::render(GLuint program, Camera &camera)
 		_mesh[i].render(program, camera, false);
 	glEnable(GL_DEPTH_TEST);
 }
+
+

@@ -17,10 +17,11 @@ using namespace std;
 
 const vector<string> testField =
 {
-	"P...",
-	"#.#.",
-	"..#.",
-	"ZD.K"
+	"P...#",
+	"#.#..",
+	"D.#..",
+	"Z...#",
+	"....K"
 };
 const uint testSize = testField.size();
 
@@ -30,17 +31,23 @@ vector<TextMesh*> texts(0);
 FlatMesh* sych;
 GameTextures globalTextures;
 
-//flag
-
 void register_textures()
 {
-	globalTextures.borderTex =		get_texture_from_tga("textures/border.tga");
-	globalTextures.emptyTex =		get_texture_from_tga("textures/empty.tga");
-	globalTextures.wallTex =		get_texture_from_tga("textures/wall.tga");
-	globalTextures.knightTex =		get_texture_from_tga("textures/sych.tga");
-	globalTextures.princessTex =	get_texture_from_tga("textures/princess.tga");
-	globalTextures.dragonTex =		get_texture_from_tga("textures/putler.tga");
-	globalTextures.zombieTex =		get_texture_from_tga("textures/liberator.tga");
+	globalTextures.borderTex		.resize(1);
+	globalTextures.emptyTex			.resize(1);
+	globalTextures.wallTex			.resize(1);
+	globalTextures.knightTex		.resize(1);
+	globalTextures.princessTex		.resize(1);
+	globalTextures.dragonTex		.resize(1);
+	globalTextures.zombieTex		.resize(1);
+
+	globalTextures.borderTex 		[0].push_back(get_texture_from_tga("textures/border.tga"));
+	globalTextures.emptyTex 		[0].push_back(get_texture_from_tga("textures/empty.tga"));
+	globalTextures.wallTex 			[0].push_back(get_texture_from_tga("textures/wall.tga"));
+	globalTextures.knightTex 		[0].push_back(get_texture_from_tga("textures/sych.tga"));
+	globalTextures.princessTex 		[0].push_back(get_texture_from_tga("textures/princess.tga"));
+	globalTextures.dragonTex 		[0].push_back(get_texture_from_tga("textures/putler.tga"));
+	globalTextures.zombieTex 		[0].push_back(get_texture_from_tga("textures/liberator.tga"));
 }
 
 void render()
@@ -50,7 +57,7 @@ void render()
 
 	mainDispatcher->render(textProgram, textCamera);
 
-	//texts[0]->render(textProgram, textCamera);
+	texts[0]->render(textProgram, textCamera);
 	//sych->render(textProgram, textCamera);
 
 	glutSwapBuffers();
@@ -73,14 +80,11 @@ void init_scene()
 {
 	register_textures();
 
-	mainDispatcher = new GameDispatcher(globalTextures, 600, 0, 0, 4, testField);
+	mainDispatcher = new GameDispatcher(globalTextures, 600, 0, 0, testSize, testField);
 
-	/*sych = new FlatMesh(WND_RES[0], WND_RES[1], 50, 50, globalTextures.emptyTex, WND_ASPECT, 100);
 	
 	texts.resize(1);
-	texts[0] = new TextMesh(WND_RES[0], WND_RES[1], 500, 500,"text", vec4(1.0, 1.0, 1.0, 1.0), WND_ASPECT, 40);
-	
-	sych->move_to(300, 300);*/
+	texts[0] = new TextMesh(WND_RES[0], WND_RES[1], 500, 500, "text", vec4(1.0, 0.0, 1.0, 1.0), WND_ASPECT, 40);
 }
 
 void on_mouse_click(int button, int state, int x, int y)

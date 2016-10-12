@@ -13,10 +13,14 @@
 class TextMesh
 {
 public:
-	TextMesh(int wnd_w, int wnd_h, int X, int Y, char *text, vec4 color, float aspect, float scale);
+	TextMesh(const int wnd_w, const int wnd_h, const int X, const int Y, const char *text, 
+		const vec4 color, const float aspect, const float scale);
 	void render(GLuint program, Camera &camera);
+	void move_to(int x, int y);
 private:
-
+	GLfloat _scale;
+	int _wndH, _wndW, _aspect;
+	std::string _text;
 	std::vector<Mesh> _mesh;
 	vec4 _color;
 };
