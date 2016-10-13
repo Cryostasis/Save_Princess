@@ -1,4 +1,5 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <GL/glew.h>
 #include <GL/freeglut.h>
@@ -10,6 +11,7 @@
 #include <queue>
 #include <sstream>
 
+//#include "control_panel.h"
 #include "camera.h"
 #include "gl_vars.h"
 #include "mesh.h"
@@ -19,6 +21,20 @@ using namespace std;
 
 typedef unsigned int uint;
 
+#define CELL_EMPTY '.'
+#define CELL_KNIGHT 'K'
+#define CELL_DRAGON 'D'
+#define CELL_ZOMBIE 'Z'
+#define CELL_WALL '#'
+#define CELL_PRINCESS 'P'
+
+extern bool flagGameStarted;
+
+const set<char> USED_SYMBOLS =
+{ CELL_DRAGON, CELL_EMPTY, CELL_KNIGHT, CELL_PRINCESS, CELL_WALL, CELL_ZOMBIE };
+const set<char> MONSTER_SYMBOLS =
+{ CELL_DRAGON, CELL_ZOMBIE };
+/*
 #define STRENGTH_PER_ATTACK 2
 #define STRENGTH_REGEN 2
 #define HP_REGEN 2
@@ -34,15 +50,26 @@ typedef unsigned int uint;
 
 #define DRAGON_MAX_HP 20
 #define DRAGON_ATTAK_POWER 5 
+*/
+
+extern uint STRENGTH_PER_ATTACK;
+extern uint STRENGTH_REGEN;
+extern uint HP_REGEN;
+
+extern uint KNIGHT_MAX_STRENGTH;
+extern uint KNIGHT_MAX_HP;
+extern uint KNIGHT_ATTAK_POWER;
+
+extern uint PRINCESS_MAX_HP;
+
+extern uint ZOMBIE_MAX_HP;
+extern uint ZOMBIE_ATTAK_POWER;
+
+extern uint DRAGON_MAX_HP;
+extern uint DRAGON_ATTAK_POWER;
 
 #define BORDER_W_PCNT 5
-
-#define CELL_EMPTY '.'
-#define CELL_KNIGHT 'K'
-#define CELL_DRAGON 'D'
-#define CELL_ZOMBIE 'Z'
-#define CELL_WALL '#'
-#define CELL_PRINCESS 'P'
+#define BORDER_W_PX 20
 
 #define HP_TEXT_PRECENT 20
 const vec4 HP_TEXT_COLOR = {1.0, 0.0, 0.0, 1.0};
@@ -167,7 +194,7 @@ public:
 	void your_turn();
 	pair<uint, uint> get_coords() { return {_x, _y}; };
 
-	void render(GLuint program, Camera camera) override;
+	void render(const GLuint program, Camera camera) override;
 	virtual void hit(const uint hit_value) override;
 protected:
 	bool _isAlive;
@@ -218,11 +245,11 @@ struct GameTextures
 class GameDispatcher
 {
 public:
-	GameDispatcher(GameTextures textures, const uint pxSize, const uint offsetX, const uint offsetY,
+	GameDispatcher(GameTextures& textures, const uint pxSize, const uint offsetX, const uint offsetY,
 		const uint size, const  vector<string>& field);
-	GameDispatcher(GameTextures textures, const uint pxSize, const uint offsetX, const uint offsetY,
+	GameDispatcher(GameTextures& textures, const uint pxSize, const uint offsetX, const uint offsetY,
 		const uint size, const char** field);
-	GameDispatcher(GameTextures textures, const uint pxSize, const uint offsetX, const uint offsetY,
+	GameDispatcher(GameTextures& textures, const uint pxSize, const uint offsetX, const uint offsetY,
 		const char* file);
 
 	void render(GLuint program, Camera camera);
@@ -252,7 +279,7 @@ private:
 	Knight* _knight;
 	Princess* _princess;
 
-	AnimatedMesh* _emptyMesh;
+	vector<vector<AnimatedMesh*>> _emptyMesh;
 	AnimatedMesh* _border;
 	vector<AnimatedMesh*> _walls;
 
@@ -262,17 +289,8 @@ private:
 	vector<string> _field;
 	void prepare_field();
 
-	GameTextures _textures;
+	GameTextures& _textures;
 
 	uint _offsetX, _offsetY;
 	uint _sizeInPixels;
 };
-
-/*
-class GameInterface
-{
-public:
-
-private:
-	GameDispatcher _dispatcher;
-};*/

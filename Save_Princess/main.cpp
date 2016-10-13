@@ -1,5 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
-
+#pragma warning (disable: 4996)
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
@@ -16,6 +16,8 @@
 #include "fonts.h"
 #include "save_princess.h"
 
+#include "control_panel.h"
+
 using namespace std;
 
 void init(int argc, char *argv[])
@@ -31,8 +33,7 @@ void init(int argc, char *argv[])
 
 	cout << (unsigned char*)glGetString(GL_VENDOR) << endl << (unsigned char*)glGetString(GL_RENDERER) << endl;
 
-	glutWindow = glutGetWindow();
-	glutShowWindow();
+
 	glutMainLoop();
 }
 

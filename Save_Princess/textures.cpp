@@ -41,7 +41,7 @@ GLuint get_texture_from_tga(char *name)
 
 	if (header->datatype != 2 || (header->bitperpel != 24 && header->bitperpel != 32))
 	{
-		sprintf(buf, "Wrong TGA format in file '%s'\n");
+		sprintf(buf, "Wrong TGA format in file '%s'\n", name);
 		raise_error(buf, false, true);
 		delete[] buffer;
 		return 0;

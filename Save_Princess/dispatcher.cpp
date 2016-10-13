@@ -10,27 +10,40 @@
 
 using namespace std;
 
-const set<char> USED_SYMBOLS = 
-	{ CELL_DRAGON, CELL_EMPTY, CELL_KNIGHT, CELL_PRINCESS, CELL_WALL, CELL_ZOMBIE };
-const set<char> MONSTER_SYMBOLS =
-	{ CELL_DRAGON, CELL_ZOMBIE };
+bool flagGameStarted = false;
+
+uint STRENGTH_PER_ATTACK;
+uint STRENGTH_REGEN;
+uint HP_REGEN;
+
+uint KNIGHT_MAX_STRENGTH;
+uint KNIGHT_MAX_HP;
+uint KNIGHT_ATTAK_POWER;
+
+uint PRINCESS_MAX_HP = 1;
+
+uint ZOMBIE_MAX_HP;
+uint ZOMBIE_ATTAK_POWER;
+
+uint DRAGON_MAX_HP;
+uint DRAGON_ATTAK_POWER;
 
 //-------------------GAME_DISPATCHER--------------------------------------------------------------
 
 GameDispatcher::GameDispatcher(
-	GameTextures textures, const uint pxSize, const uint offsetX, const uint offsetY,
+	GameTextures& textures, const uint pxSize, const uint offsetX, const uint offsetY,
 	const uint size, const std::vector<std::string>& field) :
 	_fieldSize(size), _field(field), _textures(textures), _sizeInPixels(pxSize),
-	_offsetX(offsetX + BORDER_W_PCNT * pxSize / 100), _offsetY(offsetY + BORDER_W_PCNT * pxSize / 100)
+	_offsetX(offsetX + BORDER_W_PX), _offsetY(offsetY + BORDER_W_PX)
 {
 	//GameDispatcher(textures, pxSize, offsetX, offsetY);
 	prepare_field();
 }
 
 GameDispatcher::GameDispatcher(
-	GameTextures textures, const uint pxSize, const uint offsetX, const uint offsetY, const uint size, const char ** field) :
+	GameTextures& textures, const uint pxSize, const uint offsetX, const uint offsetY, const uint size, const char ** field) :
 	_fieldSize(size), _field(size), _textures(textures), _sizeInPixels(pxSize),
-	_offsetX(offsetX + BORDER_W_PCNT * pxSize / 100), _offsetY(offsetY + BORDER_W_PCNT * pxSize / 100)
+	_offsetX(offsetX + BORDER_W_PX), _offsetY(offsetY + BORDER_W_PX)
 {
 	//GameDispatcher(textures, pxSize, offsetX, offsetY);
 	try
@@ -48,9 +61,9 @@ GameDispatcher::GameDispatcher(
 }
 
 GameDispatcher::GameDispatcher(
-	GameTextures textures, const uint pxSize, const uint offsetX, const uint offsetY, const char * file) :
+	GameTextures& textures, const uint pxSize, const uint offsetX, const uint offsetY, const char * file) :
 	_textures(textures), _sizeInPixels(pxSize),
-	_offsetX(offsetX + BORDER_W_PCNT * pxSize / 100), _offsetY(offsetY + BORDER_W_PCNT * pxSize / 100)
+	_offsetX(offsetX + BORDER_W_PX), _offsetY(offsetY + BORDER_W_PX)
 {
 	//GameDispatcher(textures, pxSize, offsetX, offsetY);
 	fstream fin;
@@ -66,7 +79,7 @@ GameDispatcher::GameDispatcher(
 
 void GameDispatcher::hit_xy(uint x, uint y, uint damage)
 {
-	for (int i = 0; i < _monsters.size(); i++)
+	for (size_t i = 0; i < _monsters.size(); i++)
 		if (_monsters[i]->get_coords() == pair<uint, uint>(x, y))
 			_monsters[i]->hit(damage);
 }
@@ -78,11 +91,11 @@ void GameDispatcher::hit_knight(uint damage)
 
 void GameDispatcher::tact()
 {
-	for (int i = 0; i < _monsters.size(); i++)
+	for (size_t i = 0; i < _monsters.size(); i++)
 		_monsters[i]->your_turn();
 	_princess->check_knight();
 
-	for (int i = 0; i < _fieldSize; i++)
+	for (size_t i = 0; i < _fieldSize; i++)
 		cout << _field[i] << endl;
 	cout << "\n\n\n";
 }
@@ -91,21 +104,28 @@ void GameDispatcher::game_over()
 {
 	glutHideWindow();
 	cout << "\n\n======GAME OVER======\n\n";
+	flagGameStarted = false;
 }
 
 void GameDispatcher::success()
 {
 	glutHideWindow();
 	cout << "\n\n======YOU WON======\n\n";
+	flagGameStarted = false;
 }
 
 void GameDispatcher::prepare_field()
 {
 	int knightCnt = 0, princessCnt = 0;
 	bool flagError = false;
+	_emptyMesh.resize(_fieldSize);
 	for (uint i = 0; i < _fieldSize; i++)
 		for (uint j = 0; j < _fieldSize; j++)
 		{
+			_emptyMesh[i].resize(_fieldSize);
+			_emptyMesh[i][j] = new AnimatedMesh(
+				j * get_cell_size() + _offsetX, i * get_cell_size() + _offsetY,
+				&_textures.emptyTex, get_cell_size());
 			if (USED_SYMBOLS.find(_field[i][j]) == USED_SYMBOLS.end())
 				raise_error("Wrong field", false, true);
 			switch (_field[i][j])
@@ -140,20 +160,21 @@ void GameDispatcher::prepare_field()
 	if (knightCnt != 1 || princessCnt != 1)
 		throw std::exception("wrong field");
 
-	_emptyMesh = new AnimatedMesh(_offsetX, _offsetY, &_textures.emptyTex, _sizeInPixels);
 	_border = new AnimatedMesh(
-		_offsetX - BORDER_W_PCNT * _sizeInPixels / 100, _offsetY - BORDER_W_PCNT * _sizeInPixels / 100,
-		&_textures.borderTex, _sizeInPixels * (100 + BORDER_W_PCNT * 2) / 100);
+		_offsetX - BORDER_W_PX, _offsetY - BORDER_W_PX,
+		&_textures.borderTex, _sizeInPixels  + 2 * BORDER_W_PX);
 }
 
 void GameDispatcher::render(GLuint program, Camera camera)
 {
 	_border->render(program, camera);
-	_emptyMesh->render(program, camera);
-	for (int i = 0; i < _walls.size(); i++)
+	for (uint i = 0; i < _fieldSize; i++)
+		for (uint j = 0; j < _fieldSize; j++)
+			_emptyMesh[i][j]->render(program, camera);
+	for (size_t i = 0; i < _walls.size(); i++)
 		_walls[i]->render(program, camera);
 
-	for (int i = 0; i < _monsters.size(); i++)
+	for (size_t i = 0; i < _monsters.size(); i++)
 		_monsters[i]->render(program, camera);
 	_knight->render(program, camera);
 	_princess->render(program, camera);
@@ -421,8 +442,3 @@ void CellMeshHP::move_to(const uint x, const uint y)
 	CellMesh::move_to(x, y);
 	_text.move_to(_offsetX + _cellSize * x, _offsetY + _cellSize * y);
 }
-
-
-
-
-

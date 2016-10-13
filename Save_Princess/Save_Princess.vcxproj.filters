@@ -24,6 +24,9 @@
     <Filter Include="Файлы исходного кода\openGL">
       <UniqueIdentifier>{264e8c9e-d110-49a4-b7d4-8e99fc82f8d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Ресурсы">
+      <UniqueIdentifier>{f13ea5d5-e909-4ae0-947d-84683d83bc7e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -80,6 +83,9 @@
     <ClCompile Include="dispatcher.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="control_panel.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="winfuncs.h">
@@ -127,6 +133,9 @@
     <ClInclude Include="dispatcher.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="control_panel.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\text_f.glsl">
@@ -135,5 +144,10 @@
     <None Include="shaders\text_v.glsl">
       <Filter>Shaders</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="input.txt">
+      <Filter>Ресурсы</Filter>
+    </Text>
   </ItemGroup>
 </Project>
