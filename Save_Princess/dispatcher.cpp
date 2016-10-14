@@ -256,6 +256,7 @@ void Knight::tact()
 {
 	_strength = min(_strength + STRENGTH_REGEN, KNIGHT_MAX_STRENGTH);
 	_hitPoints = min(_hitPoints + HP_REGEN, KNIGHT_MAX_HP);
+	_mesh.set_HP(_hitPoints);
 }
 
 void Knight::move_aux(const bool doAttack, const uint x, const uint y)

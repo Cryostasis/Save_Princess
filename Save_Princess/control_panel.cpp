@@ -178,8 +178,38 @@ ControlPanel::ControlPanel(wxWindow* parent, GameInterface& gameInterface, wxWin
 	wxBoxSizer* bSizer5;
 	bSizer5 = new wxBoxSizer(wxVERTICAL);
 
-	FieldPicker = new wxFilePickerCtrl(this, wxID_ANY, wxT("C:/code/Save_Princess/Save_Princess/input.txt"), wxT("Select field file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE);
-	bSizer5->Add(FieldPicker, 0, wxALL | wxEXPAND, 10);
+	wxBoxSizer* bSizer71;
+	bSizer71 = new wxBoxSizer(wxVERTICAL);
+
+	FieldPicker = new wxFilePickerCtrl(this, wxID_ANY, wxT("Fields/input.txt"), wxT("Select field file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE);
+	bSizer71->Add(FieldPicker, 0, wxALL | wxEXPAND, 10);
+
+
+	bSizer5->Add(bSizer71, 1, wxEXPAND, 5);
+
+	wxBoxSizer* bSizer8;
+	bSizer8 = new wxBoxSizer(wxHORIZONTAL);
+
+
+	bSizer8->Add(0, 0, 1, wxEXPAND, 5);
+
+	wxBoxSizer* bSizer9;
+	bSizer9 = new wxBoxSizer(wxHORIZONTAL);
+
+	BtnLoad = new wxButton(this, wxID_ANY, wxT("Load"), wxDefaultPosition, wxSize(75, -1), 0);
+	bSizer9->Add(BtnLoad, 0, wxALL, 5);
+
+	BtnSave = new wxButton(this, wxID_ANY, wxT("Save"), wxDefaultPosition, wxSize(75, -1), 0);
+	bSizer9->Add(BtnSave, 0, wxALL, 5);
+
+
+	bSizer8->Add(bSizer9, 1, wxEXPAND, 5);
+
+
+	bSizer8->Add(0, 0, 1, wxEXPAND, 5);
+
+
+	bSizer5->Add(bSizer8, 1, wxEXPAND, 5);
 
 
 	fgSizer1->Add(bSizer5, 1, wxEXPAND, 5);
@@ -194,11 +224,11 @@ ControlPanel::ControlPanel(wxWindow* parent, GameInterface& gameInterface, wxWin
 	bSizer7 = new wxBoxSizer(wxVERTICAL);
 
 	BtnApply = new wxButton(this, wxID_ANY, wxT("RUN"), wxDefaultPosition, wxDefaultSize, 0);
+	BtnApply->Enable(false);
+
 	bSizer7->Add(BtnApply, 0, wxALL | wxEXPAND, 8);
 
-
 	fgSizer1->Add(bSizer7, 1, wxEXPAND, 5);
-
 
 	this->SetSizer(fgSizer1);
 	this->Layout();
@@ -208,12 +238,13 @@ ControlPanel::ControlPanel(wxWindow* parent, GameInterface& gameInterface, wxWin
 	// Connect Events
 	BtnSize->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ControlPanel::BtnSizeOnButtonClick), NULL, this);
 	FieldGrid->Connect(wxEVT_GRID_CELL_CHANGE, wxGridEventHandler(ControlPanel::FieldGridCellChange), NULL, this);
-	FieldPicker->Connect(wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler(ControlPanel::PickerFileChanged), NULL, this);
+	BtnLoad->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ControlPanel::BtnLoadClick), NULL, this);
+	BtnSave->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ControlPanel::BtnSaveClick), NULL, this);
 	BtnApply->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ControlPanel::BtnApplyClick), NULL, this);
-
 
 	check_field();
 	//file_check();
+	//this->SetSize(720, 503);
 }
 
 ControlPanel::~ControlPanel()
@@ -221,8 +252,9 @@ ControlPanel::~ControlPanel()
 	// Disconnect Events
 	BtnSize->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ControlPanel::BtnSizeOnButtonClick), NULL, this);
 	FieldGrid->Disconnect(wxEVT_GRID_CELL_CHANGE, wxGridEventHandler(ControlPanel::FieldGridCellChange), NULL, this);
+	BtnLoad->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ControlPanel::BtnLoadClick), NULL, this);
+	BtnSave->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ControlPanel::BtnSaveClick), NULL, this);
 	BtnApply->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ControlPanel::BtnApplyClick), NULL, this);
-
 }
 
 void ControlPanel::BtnSizeOnButtonClick(wxCommandEvent & event)
@@ -262,9 +294,23 @@ void ControlPanel::BtnApplyClick(wxCommandEvent & event)
 	_gameInterface.form_callback(V);
 }
 
-void ControlPanel::PickerFileChanged(wxFileDirPickerEvent & event)
+void ControlPanel::BtnLoadClick(wxCommandEvent & event)
 {
 	file_check();
+}
+
+void ControlPanel::BtnSaveClick(wxCommandEvent & event)
+{
+	int n = FieldGrid->GetNumberCols();
+	ofstream fout;
+	fout.open((string)FieldPicker->GetPath());
+	fout << n << endl;
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+			fout << (char)FieldGrid->GetCellValue(i, j)[0];
+		fout << endl;
+	}
 }
 
 void ControlPanel::grid_resize()

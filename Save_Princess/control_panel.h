@@ -70,12 +70,15 @@ protected:
 	wxSpinCtrl* SpinDragonHP;
 	wxButton* BtnApply;
 	wxFilePickerCtrl* FieldPicker;
+	wxButton* BtnLoad;
+	wxButton* BtnSave;
 
 	// Virtual event handlers, overide them in your derived class
 	virtual void BtnSizeOnButtonClick(wxCommandEvent& event);
 	virtual void FieldGridCellChange(wxGridEvent& event);
 	virtual void BtnApplyClick(wxCommandEvent& event);
-	virtual void PickerFileChanged(wxFileDirPickerEvent& event);
+	virtual void BtnLoadClick(wxCommandEvent& event);
+	virtual void BtnSaveClick(wxCommandEvent& event);
 
 	void grid_resize();
 	void grid_check_cell(int i, int j);
