@@ -18,6 +18,8 @@ using namespace std;
 GameTextures globalTextures;
 GameInterface* mainInterface;
 
+bool flagTactLocal = false;
+
 void register_textures()
 {
 	globalTextures.borderTex		.resize(1);
@@ -94,6 +96,8 @@ void on_press_key(unsigned char key, int x, int y)
 
 void on_press_spec_key(int key, int x, int y)
 {
+	if (flagTactLocal || flagSleep)
+		return;
 	switch (key)
 	{
 	case GLUT_KEY_UP: { mainInterface->go_up(true); break; }
@@ -131,13 +135,16 @@ void on_mouse_move(int x, int y)
 
 void timer(int i)
 {
-	static bool init;
 	static long long last_ticks;
-	if (!init)
-		last_ticks = GetTickCount();
-	init = true;
 
-	last_ticks = GetTickCount();
+	if (flagTact)
+	{
+		last_ticks = GetTickCount();
+		flagTact = false;
+		flagTactLocal = true;
+	}
+	if (flagTactLocal && GetTickCount() - last_ticks > 0)
+		flagTactLocal = false;
 
 	render_all();
 	glutTimerFunc(TIMER_TICKS, timer, 0);

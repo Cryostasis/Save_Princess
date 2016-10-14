@@ -74,6 +74,9 @@ extern uint DRAGON_ATTAK_POWER;
 #define HP_TEXT_PRECENT 20
 const vec4 HP_TEXT_COLOR = {1.0, 0.0, 0.0, 1.0};
 
+extern bool flagTact;
+extern bool flagSleep;
+
 class Character;
 class Knight;
 class Princess;
@@ -275,6 +278,8 @@ public:
 	void tact();
 	void game_over();
 	void success();
+	void game_end(char* text);
+	void timer_callback();
 private:
 	vector<Monster*> _monsters;
 	Knight* _knight;

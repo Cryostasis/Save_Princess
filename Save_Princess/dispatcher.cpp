@@ -7,10 +7,13 @@
 #include <map>
 #include <queue>
 #include <exception>
+#include <Windows.h>
 
 using namespace std;
 
 bool flagGameStarted = false;
+bool flagTact = false;
+bool flagSleep = false;
 
 uint STRENGTH_PER_ATTACK;
 uint STRENGTH_REGEN;
@@ -89,8 +92,15 @@ void GameDispatcher::hit_knight(uint damage)
 	_knight->hit(damage);
 }
 
-void GameDispatcher::tact()
+void __stdcall TimerProc(PVOID lpParameter, BOOLEAN TimerOrWaitFired)
 {
+	GameDispatcher* ptr = (GameDispatcher*)lpParameter;
+	ptr->timer_callback();
+}
+
+void GameDispatcher::timer_callback()
+{
+	flagSleep = false;
 	for (size_t i = 0; i < _monsters.size(); i++)
 		_monsters[i]->your_turn();
 	_princess->check_knight();
@@ -98,20 +108,32 @@ void GameDispatcher::tact()
 	for (size_t i = 0; i < _fieldSize; i++)
 		cout << _field[i] << endl;
 	cout << "\n\n\n";
+
+	flagTact = true;
+}
+
+void GameDispatcher::tact()
+{
+	flagSleep = true;
+	HANDLE timer_handle_;
+	CreateTimerQueueTimer(&timer_handle_, NULL, TimerProc, this, 200, 0, WT_EXECUTEDEFAULT);
+}
+
+void GameDispatcher::game_end(char* text)
+{
+	glutHideWindow();
+	cout << text;
+	flagGameStarted = false;
 }
 
 void GameDispatcher::game_over()
 {
-	glutHideWindow();
-	cout << "\n\n======GAME OVER======\n\n";
-	flagGameStarted = false;
+	game_end("\n\n======GAME OVER======\n\n");
 }
 
 void GameDispatcher::success()
 {
-	glutHideWindow();
-	cout << "\n\n======YOU WON======\n\n";
-	flagGameStarted = false;
+	game_end("\n\n======YOU WON======\n\n");
 }
 
 void GameDispatcher::prepare_field()
@@ -264,7 +286,7 @@ void Knight::move_aux(const bool doAttack, const uint x, const uint y)
 	move(x, y);
 	if (1 && _strength >= STRENGTH_PER_ATTACK)
 	{
-		_strength -= STRENGTH_PER_ATTACK;
+		//_strength -= STRENGTH_PER_ATTACK;
 		attack(x, y);
 	}
 	tact();

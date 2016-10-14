@@ -100,14 +100,14 @@ ControlPanel::ControlPanel(wxWindow* parent, GameInterface& gameInterface, wxWin
 	LabelPrinceHP->Wrap(-1);
 	PrinceSizer->Add(LabelPrinceHP, 0, wxALL, 5);
 
-	SpinPrinceHP = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 1000, 10);
+	SpinPrinceHP = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 1000, 20);
 	PrinceSizer->Add(SpinPrinceHP, 0, wxALL, 5);
 
 	LabelPrinceStrength = new wxStaticText(this, wxID_ANY, wxT("Prince max strength"), wxDefaultPosition, wxDefaultSize, 0);
 	LabelPrinceStrength->Wrap(-1);
 	PrinceSizer->Add(LabelPrinceStrength, 0, wxALL, 5);
 
-	SpinPrinceST = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 1000, 10);
+	SpinPrinceST = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 1000, 20);
 	PrinceSizer->Add(SpinPrinceST, 0, wxALL, 5);
 
 	LabelPrinceHPregen = new wxStaticText(this, wxID_ANY, wxT("Prince HP regen"), wxDefaultPosition, wxDefaultSize, 0);
@@ -128,7 +128,7 @@ ControlPanel::ControlPanel(wxWindow* parent, GameInterface& gameInterface, wxWin
 	m_staticText5->Wrap(-1);
 	PrinceSizer->Add(m_staticText5, 0, wxALL, 5);
 
-	SpinPrinceAttack = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 1000, 3);
+	SpinPrinceAttack = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 1000, 4);
 	PrinceSizer->Add(SpinPrinceAttack, 0, wxALL, 5);
 
 	m_staticText6 = new wxStaticText(this, wxID_ANY, wxT("Prince ST per attack"), wxDefaultPosition, wxDefaultSize, 0);
