@@ -190,6 +190,7 @@ Character::Character(GameDispatcher* dispatcher, const uint x, const uint y, con
 void Character::hit(const uint hit_value)
 {
 	_hitPoints -= hit_value;
+	_mesh.set_HP(_hitPoints);
 	if (_hitPoints <= 0)
 		die();
 }
@@ -441,4 +442,10 @@ void CellMeshHP::move_to(const uint x, const uint y)
 {
 	CellMesh::move_to(x, y);
 	_text.move_to(_offsetX + _cellSize * x, _offsetY + _cellSize * y);
+}
+
+void CellMeshHP::set_HP(uint hp)
+{
+	_hp = hp; 
+	_text.set_text(itos(hp));
 }

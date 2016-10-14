@@ -38,9 +38,6 @@
     <ClCompile Include="file_load.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="error_log.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="save_princess.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
@@ -86,15 +83,15 @@
     <ClCompile Include="control_panel.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="error_log.cpp">
+      <Filter>Файлы исходного кода\openGL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="winfuncs.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="file_load.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="error_log.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="save_princess.h">
@@ -135,6 +132,9 @@
     </ClInclude>
     <ClInclude Include="control_panel.h">
       <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="error_log.h">
+      <Filter>Заголовочные файлы\openGL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

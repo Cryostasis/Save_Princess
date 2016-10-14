@@ -120,6 +120,7 @@ public:
 	CellMeshHP(const uint offsetX, const uint offsetY, const uint x, const uint y, const uint cellSize, uint hp,
 		textures_ptr textures);
 	virtual void move_to(const uint x, const uint y) override;
+	void set_HP(uint hp);
 private:
 	string _hpStr;
 	uint _hp;

@@ -47,6 +47,7 @@ public:
 	void look_at(vec3 pos, vec3 target, vec3 up);
 	void look_at_dir(vec3 pos, vec3 dir, vec3 up);
 	void set_size(float sz);
+	void set_size(vec3 sz);
 protected:
 	int material;
 	GLuint VAO;

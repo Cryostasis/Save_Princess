@@ -16,8 +16,9 @@
 #include <map>
 #include <vector>
 #include <iostream>
-
 #pragma warning (disable:4996) //sprintf
+
+using namespace std;
 
 struct Symbol
 {
@@ -25,10 +26,11 @@ struct Symbol
 	int x, y;
 	int width, height;
 	ObjInfo obj;
+	Mesh* mesh;
 };
 
 GLuint fontTex = -1;
-std::map<char, Symbol> fontMap;
+map<char, Symbol> fontMap;
 
 const int tex_size = 512;
 
@@ -79,8 +81,13 @@ void activate_font(char *file)
 		buf.obj.texcoords[8] = x1; buf.obj.texcoords[9] = y1;
 		buf.obj.texcoords[10] = x2; buf.obj.texcoords[11] = y2;
 
-		fontMap[buf.C] = buf;
+		
+		buf.mesh = new Mesh(
+			vec3(0.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0), fontTex, &buf.obj);
+		buf.mesh->rotate(M_PI_2, 0, 0);
 
+		fontMap[buf.C] = buf;
+		
 		elem = elem->NextSiblingElement("char");
 	}
 	
@@ -98,42 +105,19 @@ TextMesh::TextMesh(const int wnd_w, const int wnd_h, const int X, const int Y, c
 	_wndW = wnd_w;
 	_aspect = aspect;
 	_scale = scale;
-
-	_mesh.clear();
-	_mesh.resize(strlen(text));
-	int i = 0;
-	GLfloat x = X * 2 - wnd_w + scale;
-	GLfloat y = -Y * 2 + wnd_h - scale * aspect;
-	//GLfloat x = X * 2 - wnd_w, y = -Y * 2 + wnd_h;
-	//y += (GLfloat)fontMap[text[0]].height / 2 * scale / FONT_WIDTH_STD;
-	y += scale * aspect / 2;
-	while (text[i] != 0)
-	{
-		//x += (GLfloat)fontMap[text[i]].width / 2 * scale / FONT_WIDTH_STD;
-		GLfloat chr_aspect = 
-			(GLfloat)fontMap[text[i]].width / (GLfloat)fontMap[text[i]].height;
-		_mesh[i] = Mesh(
-			vec3((GLfloat)x / wnd_w, (GLfloat)y / wnd_h, 0),
-			vec3(scale, scale, scale * aspect) / wnd_w,
-			fontTex, &fontMap[text[i]].obj);
-		_mesh[i].rotate(M_PI_2, 0, 0);
-		x += chr_aspect * scale / chr_aspect;
-		i++;
-	}
+	_x = X;
+	_y = Y;
 }
 
 void TextMesh::move_to(int X, int Y)
 {
-	GLfloat x = X * 2 - _wndW + _scale;
-	GLfloat y = -Y * 2 + _wndH - _scale * _aspect;
-	y += _scale * _aspect / 2;
-	for (int i = 0; i < _mesh.size(); i++)
-	{
-		GLfloat chr_aspect =
-			(GLfloat)fontMap[_text[i]].width / (GLfloat)fontMap[_text[i]].height;
-		_mesh[i].move_to(vec3((GLfloat)x / _wndW, (GLfloat)y / _wndH, 0));
-		x += chr_aspect * _scale / chr_aspect;
-	}
+	_x = X;
+	_y = Y;
+}
+
+void TextMesh::set_text(string text)
+{
+	_text = text;
 }
 
 void TextMesh::render(GLuint program, Camera &camera)
@@ -144,8 +128,24 @@ void TextMesh::render(GLuint program, Camera &camera)
 	glUniform4fv(LINE_COLOR_LOC, 1, _color.v);
 
 	glUniform1i(FONT_TEX, 0);
-	for (size_t i = 0; i < _mesh.size(); i++)
-		_mesh[i].render(program, camera, false);
+	int i = 0;
+	GLfloat x = _x * 2 - _wndW + _scale;
+	GLfloat y = -_y * 2 + _wndH - _scale * _aspect;
+	y += _scale * _aspect / 2;
+	while (_text[i] != 0)
+	{
+		//x += (GLfloat)fontMap[text[i]].width / 2 * scale / FONT_WIDTH_STD;
+		GLfloat chr_aspect =
+			(GLfloat)fontMap[_text[i]].width / (GLfloat)fontMap[_text[i]].height;
+		fontMap[_text[i]].mesh->set_size(vec3(_scale, _scale, _scale * _aspect) / _wndW);
+		fontMap[_text[i]].mesh->move_to(vec3((GLfloat)x / _wndW, (GLfloat)y / _wndH, 0));
+		
+		fontMap[_text[i]].mesh->render(program, camera, false);
+
+		x += chr_aspect * _scale / chr_aspect;
+		i++;
+	}
+
 	glEnable(GL_DEPTH_TEST);
 }
 

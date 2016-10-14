@@ -183,6 +183,11 @@ void Mesh::set_size(float sz)
 	scale = GLScale(sz, sz, sz);
 }
 
+void Mesh::set_size(vec3 sz)
+{
+	scale = GLScale(sz);
+}
+
 void Mesh::look_at(vec3 pos, vec3 target, vec3 up)
 {
 	position = pos;

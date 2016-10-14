@@ -91,7 +91,6 @@ public:
 		long style = wxCAPTION | wxTAB_TRAVERSAL);
 
 	~ControlPanel();
-
 };
 
 class ControlForm : public wxApp
@@ -103,7 +102,7 @@ private:
 	ControlPanel* _control;
 	bool OnInit()
 	{
-		_control = new ControlPanel(NULL, _gameInterface, -1, "123");
+		_control = new ControlPanel(NULL, _gameInterface, -1, "Conrol panel");
 		_control->Show();
 		glutMainLoop();
 		return true;
