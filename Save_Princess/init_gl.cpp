@@ -187,7 +187,7 @@ int main_gl_init(int argc, char *argv[])
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(WND_RES[0], WND_RES[1]);
 	glutInitWindowPosition(WND_POS[0], WND_POS[1]);
-	glutCreateWindow("SOSIPISOS");
+	glutCreateWindow("Game");
 	glutHideWindow();
 
 	//hwnd = GetActiveWindow();

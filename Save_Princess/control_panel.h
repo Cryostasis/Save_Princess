@@ -27,10 +27,6 @@
 
 #include <set>
 
-using namespace std;
-
-
-
 ///////////////////////////////////////////////////////////////////////////
 
 
@@ -89,8 +85,9 @@ protected:
 	GameInterface& _gameInterface;
 public:
 
-	ControlPanel(wxWindow* parent, GameInterface& gameInterface, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString,
-		const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(820, 503), 
+	ControlPanel(wxWindow* parent, GameInterface& gameInterface, 
+		wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString,
+		const wxPoint& pos = wxPoint(70, 70), const wxSize& size = wxSize(820, 650), 
 		long style = wxCAPTION | wxTAB_TRAVERSAL);
 
 	~ControlPanel();
@@ -115,7 +112,7 @@ private:
 class GameInterface
 {
 public:
-	GameInterface(GameTextures& textures) : _textures(textures) {};
+	GameInterface(GameTextures& textures) : _textures(textures), _dispatcher(nullptr) {};
 	void create_form()
 	{
 		wxApp* pApp = new ControlForm(*this);
@@ -127,10 +124,12 @@ public:
 	void go_down(const bool attack) { _dispatcher->go_down(attack); };
 	void go_right(const bool attack) { _dispatcher->go_right(attack); };
 	void go_left(const bool attack) { _dispatcher->go_left(attack); };
+	void skip() { _dispatcher->skip(); };
 
-	void form_callback(vector<string> V);
+	void form_callback(std::vector<string> V);
 	void render(GLuint program, Camera camera)
 	{
+		if (_dispatcher != nullptr)
 		_dispatcher->render(program, camera);
 	}
 private:

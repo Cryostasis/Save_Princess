@@ -112,11 +112,24 @@ void GameDispatcher::timer_callback()
 	flagTact = true;
 }
 
+GameDispatcher::~GameDispatcher()
+{
+	delete _knight;
+	delete _princess;
+	for (int i = 0; i < _monsters.size(); i++)
+		delete _monsters[i];
+	for (int i = 0; i < _walls.size(); i++)
+		delete _walls[i];
+	for (int i = 0; i < _emptyMesh.size(); i++)
+		for (int j = 0; j < _emptyMesh.size(); j++)
+			delete _emptyMesh[i][j];
+}
+
 void GameDispatcher::tact()
 {
 	flagSleep = true;
 	HANDLE timer_handle_;
-	CreateTimerQueueTimer(&timer_handle_, NULL, TimerProc, this, 200, 0, WT_EXECUTEDEFAULT);
+	CreateTimerQueueTimer(&timer_handle_, NULL, TimerProc, this, TIMER_DELAY, 0, WT_EXECUTEDEFAULT);
 }
 
 void GameDispatcher::game_end(char* text)
@@ -252,6 +265,11 @@ void Knight::move_left(const bool attack)
 void Knight::move_right(const bool attack)
 {
 	move_aux(attack, _x + 1, _y);
+}
+
+void Knight::skip()
+{
+	tact();
 }
 
 void Knight::move_down(const bool attack)

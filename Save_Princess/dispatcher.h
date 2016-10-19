@@ -17,8 +17,6 @@
 #include "mesh.h"
 #include "fonts.h"
 
-using namespace std;
-
 typedef unsigned int uint;
 
 #define CELL_EMPTY '.'
@@ -34,23 +32,6 @@ const set<char> USED_SYMBOLS =
 { CELL_DRAGON, CELL_EMPTY, CELL_KNIGHT, CELL_PRINCESS, CELL_WALL, CELL_ZOMBIE };
 const set<char> MONSTER_SYMBOLS =
 { CELL_DRAGON, CELL_ZOMBIE };
-/*
-#define STRENGTH_PER_ATTACK 2
-#define STRENGTH_REGEN 2
-#define HP_REGEN 2
-
-#define KNIGHT_MAX_STRENGTH 10
-#define KNIGHT_MAX_HP 12
-#define KNIGHT_ATTAK_POWER 3
-
-#define PRINCESS_MAX_HP 1
-
-#define ZOMBIE_MAX_HP 1
-#define ZOMBIE_ATTAK_POWER 3
-
-#define DRAGON_MAX_HP 20
-#define DRAGON_ATTAK_POWER 5 
-*/
 
 extern uint STRENGTH_PER_ATTACK;
 extern uint STRENGTH_REGEN;
@@ -70,8 +51,9 @@ extern uint DRAGON_ATTAK_POWER;
 
 #define BORDER_W_PCNT 5
 #define BORDER_W_PX 20
+#define TIMER_DELAY 50
 
-#define HP_TEXT_PRECENT 20
+#define HP_TEXT_PRECENT 30
 const vec4 HP_TEXT_COLOR = {1.0, 0.0, 0.0, 1.0};
 
 extern bool flagTact;
@@ -179,6 +161,7 @@ public:
 	void move_down(const bool attack);
 	void move_left(const bool attack);
 	void move_right(const bool attack);
+	void skip();
 	void attack_forward();
 protected:
 	virtual void die() override;
@@ -206,13 +189,15 @@ protected:
 	virtual void attack(const uint x, const uint y) = 0;
 private:
 	bool bfs_aux_step(
-		pair<uint, uint> v, pair<uint, uint> to, set<pair<uint, uint>>& used, 
-		map<pair<uint, uint>, pair<uint, uint>>& p, map<pair<uint, uint>, int>& d, 
-		queue<pair<uint, uint>>& q, pair<uint, uint>& knight);
+		std::pair<uint, uint> v, std::pair<uint, uint> to, std::set<std::pair<uint, uint>>& used,
+		std::map<std::pair<uint, uint>, std::pair<uint, uint>>& p, 
+		std::map<std::pair<uint, uint>, int>& d,
+		std::queue<std::pair<uint, uint>>& q, std::pair<uint, uint>& knight);
 	bool bfs_aux_check(
-		pair<uint, uint> v, pair<uint, uint> to, set<pair<uint, uint>>& used,
-		map<pair<uint, uint>, pair<uint, uint>>& p, map<pair<uint, uint>, int>& d,
-		queue<pair<uint, uint>>& q, pair<uint, uint>& knight);
+		std::pair<uint, uint> v, std::pair<uint, uint> to, std::set<std::pair<uint, uint>>& used,
+		std::map<std::pair<uint, uint>, std::pair<uint, uint>>& p, 
+		std::map<std::pair<uint, uint>, int>& d,
+		std::queue<std::pair<uint, uint>>& q, std::pair<uint, uint>& knight);
 };
 
 class Zombie : public Monster
@@ -242,15 +227,15 @@ struct GameTextures
 {
 	GameTextures() : knightTex(0), princessTex(0), zombieTex(0), dragonTex(0),
 		wallTex(0), emptyTex(0), borderTex(0) {};
-	vector<vector<GLuint>> knightTex, princessTex, zombieTex, dragonTex;
-	vector<vector<GLuint>> wallTex, emptyTex, borderTex;
+	std::vector<std::vector<GLuint>> knightTex, princessTex, zombieTex, dragonTex;
+	std::vector<std::vector<GLuint>> wallTex, emptyTex, borderTex;
 };
 
 class GameDispatcher
 {
 public:
 	GameDispatcher(GameTextures& textures, const uint pxSize, const uint offsetX, const uint offsetY,
-		const uint size, const  vector<string>& field);
+		const uint size, const  std::vector<string>& field);
 	GameDispatcher(GameTextures& textures, const uint pxSize, const uint offsetX, const uint offsetY,
 		const uint size, const char** field);
 	GameDispatcher(GameTextures& textures, const uint pxSize, const uint offsetX, const uint offsetY,
@@ -262,6 +247,8 @@ public:
 	void go_down(const bool attack) { _knight->move_down(attack); tact(); };
 	void go_right(const bool attack) { _knight->move_right(attack); tact(); };
 	void go_left(const bool attack) { _knight->move_left(attack); tact(); };
+	void skip() { _knight->skip(); tact(); };
+
 	void attack_forward() { _knight->attack_forward(); };
 
 	uint get_offset_X() { return _offsetX; };
@@ -280,19 +267,19 @@ public:
 	void success();
 	void game_end(char* text);
 	void timer_callback();
+
+	~GameDispatcher();
 private:
-	vector<Monster*> _monsters;
+	std::vector<Monster*> _monsters;
 	Knight* _knight;
 	Princess* _princess;
 
-	vector<vector<AnimatedMesh*>> _emptyMesh;
+	std::vector<std::vector<AnimatedMesh*>> _emptyMesh;
 	AnimatedMesh* _border;
-	vector<AnimatedMesh*> _walls;
-
-	map<pair<uint, uint>, Character*> _characterMap;
+	std::vector<AnimatedMesh*> _walls;
 
 	uint _fieldSize;
-	vector<string> _field;
+	std::vector<string> _field;
 	void prepare_field();
 
 	GameTextures& _textures;

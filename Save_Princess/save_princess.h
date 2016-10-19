@@ -13,8 +13,6 @@
 #include "mesh.h"
 #include "control_panel.h"
 
-void render();
-void render_scene();
 void on_mouse_click(int button, int state, int x, int y);
 void on_press_key(unsigned char key, int x, int y);
 void on_press_spec_key(int key, int x, int y);

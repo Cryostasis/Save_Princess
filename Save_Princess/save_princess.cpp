@@ -100,6 +100,7 @@ void on_press_spec_key(int key, int x, int y)
 		return;
 	switch (key)
 	{
+	case GLUT_KEY_SHIFT_R: { mainInterface->skip(); break; }
 	case GLUT_KEY_UP: { mainInterface->go_up(true); break; }
 	case GLUT_KEY_DOWN: { mainInterface->go_down(true); break; }
 	case GLUT_KEY_RIGHT: { mainInterface->go_right(true); break; }
@@ -143,7 +144,7 @@ void timer(int i)
 		flagTact = false;
 		flagTactLocal = true;
 	}
-	if (flagTactLocal && GetTickCount() - last_ticks > 0)
+	if (flagTactLocal && GetTickCount() - last_ticks > TIMER_DELAY)
 		flagTactLocal = false;
 
 	render_all();

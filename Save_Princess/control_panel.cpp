@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 
+#define GRID_CELL_SIZE 15
+
 #define wxEVT_GRID_CELL_CHANGE wxEVT_GRID_CELL_CHANGED 
 
 ControlPanel::ControlPanel(wxWindow* parent, GameInterface& gameInterface, wxWindowID id, const wxString& title,
@@ -21,7 +23,8 @@ ControlPanel::ControlPanel(wxWindow* parent, GameInterface& gameInterface, wxWin
 	wxBoxSizer* FieldSizer;
 	FieldSizer = new wxBoxSizer(wxVERTICAL);
 
-	SpinSize = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 3, 15, 15);
+	SpinSize = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, 
+		wxDefaultSize, wxSP_ARROW_KEYS, 3, 25, 25);
 	FieldSizer->Add(SpinSize, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 5);
 
 	BtnSize = new wxButton(this, wxID_ANY, wxT("Set size"), wxDefaultPosition, wxDefaultSize, 0);
@@ -30,49 +33,23 @@ ControlPanel::ControlPanel(wxWindow* parent, GameInterface& gameInterface, wxWin
 	FieldGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
 
 	// Grid
-	FieldGrid->CreateGrid(15, 15);
+	FieldGrid->CreateGrid(25, 25);
 	FieldGrid->EnableEditing(true);
 	FieldGrid->EnableGridLines(true);
 	FieldGrid->EnableDragGridSize(false);
 	FieldGrid->SetMargins(0, 0);
 
 	// Columns
-	FieldGrid->SetColSize(0, 20);
-	FieldGrid->SetColSize(1, 20);
-	FieldGrid->SetColSize(2, 20);
-	FieldGrid->SetColSize(3, 20);
-	FieldGrid->SetColSize(4, 20);
-	FieldGrid->SetColSize(5, 20);
-	FieldGrid->SetColSize(6, 20);
-	FieldGrid->SetColSize(7, 20);
-	FieldGrid->SetColSize(8, 20);
-	FieldGrid->SetColSize(9, 20);
-	FieldGrid->SetColSize(10, 20);
-	FieldGrid->SetColSize(11, 20);
-	FieldGrid->SetColSize(12, 20);
-	FieldGrid->SetColSize(13, 20);
-	FieldGrid->SetColSize(14, 20);
+	for (int i = 0; i < 25; i++)
+		FieldGrid->SetColSize(i, GRID_CELL_SIZE);
 	FieldGrid->EnableDragColMove(false);
 	FieldGrid->EnableDragColSize(true);
 	FieldGrid->SetColLabelSize(0);
 	FieldGrid->SetColLabelAlignment(wxALIGN_CENTRE, wxALIGN_CENTRE);
 
 	// Rows
-	FieldGrid->SetRowSize(0, 20);
-	FieldGrid->SetRowSize(1, 20);
-	FieldGrid->SetRowSize(2, 20);
-	FieldGrid->SetRowSize(3, 20);
-	FieldGrid->SetRowSize(4, 20);
-	FieldGrid->SetRowSize(5, 20);
-	FieldGrid->SetRowSize(6, 20);
-	FieldGrid->SetRowSize(7, 20);
-	FieldGrid->SetRowSize(8, 20);
-	FieldGrid->SetRowSize(9, 20);
-	FieldGrid->SetRowSize(10, 20);
-	FieldGrid->SetRowSize(11, 20);
-	FieldGrid->SetRowSize(12, 20);
-	FieldGrid->SetRowSize(13, 20);
-	FieldGrid->SetRowSize(14, 20);
+	for (int i = 0; i < 25; i++)
+		FieldGrid->SetRowSize(i, GRID_CELL_SIZE);
 	FieldGrid->EnableDragRowSize(true);
 	FieldGrid->SetRowLabelSize(0);
 	FieldGrid->SetRowLabelAlignment(wxALIGN_CENTRE, wxALIGN_CENTRE);
@@ -244,7 +221,9 @@ ControlPanel::ControlPanel(wxWindow* parent, GameInterface& gameInterface, wxWin
 
 	check_field();
 	//file_check();
-	//this->SetSize(720, 503);
+	this->SetPosition(wxPoint(170, 70));
+	this->SetSize(820, 580);
+
 }
 
 ControlPanel::~ControlPanel()
@@ -337,8 +316,8 @@ void ControlPanel::grid_resize()
 	}
 	for (int i = 0; i < neW; i++)
 	{
-		FieldGrid->SetColSize(i, 20);
-		FieldGrid->SetRowSize(i, 20);
+		FieldGrid->SetColSize(i, GRID_CELL_SIZE);
+		FieldGrid->SetRowSize(i, GRID_CELL_SIZE);
 	}
 	fix_cell_alignment();
 	check_field();
@@ -409,6 +388,8 @@ bool ControlPanel::check_field()
 
 void GameInterface::form_callback(vector<string> V)
 {
+	if (_dispatcher != nullptr)
+		delete _dispatcher;
 	_dispatcher = new GameDispatcher(_textures, WND_RES[0] - 2 * BORDER_W_PX, 0, 0, V.size(), V);
 	flagGameStarted = true;
 	glutShowWindow();
