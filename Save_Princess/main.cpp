@@ -31,9 +31,6 @@ void init(int argc, char *argv[])
 	activate_font("textures/font");
 	init_scene();
 
-	cout << (unsigned char*)glGetString(GL_VENDOR) << endl << (unsigned char*)glGetString(GL_RENDERER) << endl;
-
-
 	glutMainLoop();
 }
 

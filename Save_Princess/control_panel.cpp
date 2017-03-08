@@ -226,6 +226,8 @@ ControlPanel::ControlPanel(wxWindow* parent, GameInterface& gameInterface, wxWin
 
 }
 
+bool flagLoad = false;
+
 ControlPanel::~ControlPanel()
 {
 	// Disconnect Events
@@ -325,6 +327,8 @@ void ControlPanel::grid_resize()
 
 void ControlPanel::grid_check_cell(int x, int y)
 {
+	if (flagLoad)
+		return;
 	if (FieldGrid->GetCellValue(x, y).length() > 1)
 		FieldGrid->SetCellValue(x, y, FieldGrid->GetCellValue(x, y)[0]);
 	if (FieldGrid->GetCellValue(x, y).length() == 0 ||
@@ -343,6 +347,7 @@ void ControlPanel::fix_cell_alignment()
 
 void ControlPanel::file_check()
 {
+	flagLoad = true;
 	ifstream fin;
 	fin.open((string)FieldPicker->GetPath());
 	int n;
@@ -357,7 +362,7 @@ void ControlPanel::file_check()
 			FieldGrid->SetCellValue(i, j, c);
 			grid_check_cell(i, j);
 		}
-
+	flagLoad = false;
 	check_field();
 }
 
@@ -388,8 +393,8 @@ bool ControlPanel::check_field()
 
 void GameInterface::form_callback(vector<string> V)
 {
-	if (_dispatcher != nullptr)
-		delete _dispatcher;
+	//if (_dispatcher != nullptr)
+	//	delete _dispatcher;
 	_dispatcher = new GameDispatcher(_textures, WND_RES[0] - 2 * BORDER_W_PX, 0, 0, V.size(), V);
 	flagGameStarted = true;
 	glutShowWindow();

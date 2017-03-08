@@ -211,6 +211,7 @@ int main_gl_init(int argc, char *argv[])
 	glutMouseFunc(on_mouse_click);
 
 	//glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
+	cout << (unsigned char*)glGetString(GL_VENDOR) << endl << (unsigned char*)glGetString(GL_RENDERER) << endl;
 
 	return ST_OK;
 }
